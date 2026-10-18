@@ -1,0 +1,82 @@
+<section class="admin-data-sec">
+  <div class="top-data-header">
+    <div class="title">
+      <h2>Packing Station</h2>
+    </div>
+  </div>
+
+  <div class="main-container" fxLayout="row wrap" fxLayoutAlign="center start" fxLayoutGap="20px">
+    <div fxFlex="100" fxFlex.gt-sm="45" class="camera-section">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Scan Order Invoice (QR)</mat-card-title>
+          <mat-card-subtitle>Use the barcode scanner to scan the QR code on the printed invoice.</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="text-center" style="padding: 20px;">
+          <webcam [height]="400" [width]="500" [trigger]="triggerObservable" (imageCapture)="handleImage($event)" *ngIf="showWebcam"
+                  [allowCameraSwitch]="allowCameraSwitch" [switchCamera]="nextWebcamObservable"
+                  [videoOptions]="videoOptions" (cameraSwitched)="cameraWasSwitched($event)"
+                  (initError)="handleInitError($event)"></webcam>
+          
+          <div *ngIf="errors.length > 0" style="color: red; padding: 10px; margin-top: 10px; background: #ffeeee;">
+            <h4>Webcam Error:</h4>
+            <ul>
+              <li *ngFor="let err of errors">{{err.message}}</li>
+            </ul>
+            <p>Please ensure you have granted camera permissions to this site.</p>
+          </div>
+          
+          <br/>
+          <button mat-raised-button color="primary" (click)="triggerSnapshot()" *ngIf="order && !webcamImage" style="margin-top: 15px;">
+            <mat-icon>camera_alt</mat-icon> Take Snapshot
+          </button>
+          
+          <div class="snapshot" *ngIf="webcamImage">
+            <h3>Snapshot:</h3>
+            <img [src]="webcamImage.imageAsDataUrl" width="400" />
+            <br>
+            <button mat-raised-button color="accent" (click)="uploadSnapshot()" style="margin-top: 15px;">
+              <mat-icon>cloud_upload</mat-icon> Save & Upload Packing Photo
+            </button>
+            <button mat-stroked-button (click)="webcamImage = null" style="margin-top: 15px; margin-left: 10px;">
+              Retake
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div fxFlex="100" fxFlex.gt-sm="45" class="order-section">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Order Details</mat-card-title>
+        </mat-card-header>
+        <mat-card-content *ngIf="order">
+          <div class="order-info">
+            <p><strong>Order ID:</strong> #{{ order.orderId }}</p>
+            <p><strong>Name:</strong> {{ order.name }}</p>
+            <p><strong>Phone:</strong> {{ order.phoneNo }}</p>
+            <p><strong>Status:</strong> {{ order.orderStatus | orderStatus }}</p>
+            <p><strong>Total Amount:</strong> ৳{{ order.grandTotal }}</p>
+            
+            <mat-divider style="margin: 15px 0;"></mat-divider>
+            <h3>Items to Pack</h3>
+            <ul>
+              <li *ngFor="let item of order.orderedItems">
+                {{ item.product?.name || item.name }} (x{{ item.quantity }})
+              </li>
+            </ul>
+          </div>
+        </mat-card-content>
+        <mat-card-content *ngIf="!order" style="padding: 40px; text-align: center; color: #777;">
+          <mat-icon style="font-size: 48px; height: 48px; width: 48px;">qr_code_scanner</mat-icon>
+          <p>Scan a QR code from an invoice to load order details.</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</section>
+
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.5)" size="medium" color="#fff" type="ball-atom" [fullScreen]="true">
+  <p style="color: white"> Processing... </p>
+</ngx-spinner>

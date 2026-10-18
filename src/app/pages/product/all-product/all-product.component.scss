@@ -1,0 +1,239 @@
+@import "src/theme/exports/table-scroll2";
+@import "src/theme/exports/search-table2";
+@import "src/theme/exports/top-data-header2";
+@import "src/theme/exports/top-action-multiple2";
+@import "src/theme/exports/ng-class2";
+
+.bottom-bulk-bar {
+  position: fixed;
+  bottom: -100px;
+  left: 0;
+  right: 0;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 12px 24px;
+  z-index: 1000;
+  transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+
+  &.active {
+    bottom: 0;
+  }
+
+  .bar-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .selection-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .count {
+      background: #f6993a;
+      color: #fff;
+      min-width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+  }
+
+  .bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn-clear {
+    color: #fff;
+  }
+}
+
+// APPROVAL TABS & PILLS
+.approval-tabs-container {
+  padding: 12px 20px 0 20px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+
+  .approval-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .tab-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px 8px 0 0;
+      border: 1px solid #e2e8f0;
+      border-bottom: none;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+      }
+
+      &.active {
+        background: #fff;
+        color: #2563eb;
+        font-weight: 600;
+        border-color: #2563eb;
+        border-bottom: 2px solid #fff;
+        margin-bottom: -1px;
+      }
+
+      &.pending-all.active {
+        color: #d97706;
+        border-color: #d97706;
+      }
+
+      &.pending-book.active {
+        color: #7c3aed;
+        border-color: #7c3aed;
+      }
+
+      &.pending-price.active {
+        color: #059669;
+        border-color: #059669;
+      }
+    }
+  }
+}
+
+.proposed-price-badge {
+  margin-top: 4px;
+  display: inline-block;
+  font-size: 11px;
+  background: #fef3c7;
+  color: #b45309;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  border: 1px solid #fde68a;
+
+  .label {
+    font-weight: 500;
+    opacity: 0.85;
+  }
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+
+  &.published {
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  &.draft {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+}
+
+.approval-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 4px;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &.pending-book-pill {
+    background: #ede9fe;
+    color: #6d28d9;
+    border: 1px solid #ddd6fe;
+  }
+
+  &.pending-price-pill {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+  }
+}
+
+.td-action {
+  white-space: nowrap;
+}
+
+::ng-deep {
+  .author-filter-menu {
+    max-height: 400px !important;
+
+    .mat-menu-content {
+      padding: 0 !important;
+    }
+
+    .author-search-box {
+      padding: 8px 10px;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 10;
+      border-bottom: 1px solid #e2e8f0;
+
+      input {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 13px;
+        outline: none;
+        box-sizing: border-box;
+
+        &:focus {
+          border-color: #2563eb;
+        }
+      }
+    }
+
+    .author-menu-list {
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .no-author-msg,
+    .author-more-msg {
+      padding: 10px 12px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+  }
+}

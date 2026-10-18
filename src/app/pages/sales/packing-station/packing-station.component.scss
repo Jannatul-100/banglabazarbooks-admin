@@ -1,0 +1,42 @@
+.admin-data-sec {
+  padding: 20px;
+}
+
+.top-data-header {
+  margin-bottom: 20px;
+  .title h2 {
+    font-size: 24px;
+    font-weight: 500;
+  }
+}
+
+.main-container {
+  width: 100%;
+}
+
+.camera-section, .order-section {
+  margin-bottom: 20px;
+}
+
+.snapshot {
+  h3 {
+    margin: 10px 0;
+  }
+  img {
+    border: 2px solid #ccc;
+    border-radius: 4px;
+  }
+}
+
+ul {
+  padding-left: 20px;
+  li {
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+}
+
+.order-info p {
+  font-size: 16px;
+  margin-bottom: 8px;
+}

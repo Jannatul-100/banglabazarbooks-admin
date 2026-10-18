@@ -1,0 +1,231 @@
+<section class="add-list" id="header-data">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Manuscript {{ id ? "Update" : "Add" }}</h4>
+        </div>
+    </div>
+  <button style="margin-bottom: 10px" mat-raised-button color="warn" (click)="openPrintDialog('print')" >
+    <mat-icon>print</mat-icon>
+    Print Manuscript
+  </button>
+
+</section>
+
+<section class="from-section">
+    <form #formElement="ngForm" [formGroup]="dataForm" (ngSubmit)="onSubmit()" class="area-border">
+<!--        <div class="from">-->
+<!--            <mat-label>Name</mat-label>-->
+<!--            <mat-form-field appearance="outline">-->
+<!--                <input formControlName="name" matInput required />-->
+<!--                <mat-error>This field is required.</mat-error>-->
+<!--            </mat-form-field>-->
+<!--        </div>-->
+<!--        <div class="from">-->
+<!--            <mat-label>Email</mat-label>-->
+<!--            <mat-form-field appearance="outline">-->
+<!--                <input formControlName="email" matInput required />-->
+<!--                <mat-error>This field is required.</mat-error>-->
+<!--            </mat-form-field>-->
+<!--        </div>-->
+<!--        <div class="from">-->
+<!--            <mat-label>Phone</mat-label>-->
+<!--            <mat-form-field appearance="outline">-->
+<!--                <input formControlName="phone" matInput required />-->
+<!--                <mat-error>This field is required.</mat-error>-->
+<!--            </mat-form-field>-->
+<!--        </div>-->
+
+<!--      <div class="from">-->
+<!--            <mat-label>Profession</mat-label>-->
+<!--            <mat-form-field appearance="outline">-->
+<!--                <input formControlName="profession" matInput required />-->
+<!--                <mat-error>This field is required.</mat-error>-->
+<!--            </mat-form-field>-->
+<!--        </div>-->
+
+<!--      <div class="from">-->
+<!--        <mat-label>Address</mat-label>-->
+<!--        <mat-form-field appearance="outline">-->
+<!--          <input formControlName="address" matInput required />-->
+<!--          <mat-error>This field is required.</mat-error>-->
+<!--        </mat-form-field>-->
+<!--      </div>-->
+
+<!--      <div class="from">-->
+<!--        <mat-label>পাণ্ডুলিপির নাম</mat-label>-->
+<!--        <mat-form-field appearance="outline">-->
+<!--          <input formControlName="manuScriptName" matInput required />-->
+<!--          <mat-error>This field is required.</mat-error>-->
+<!--        </mat-form-field>-->
+<!--      </div>-->
+
+<!--      <div class="from">-->
+<!--            <mat-label>পাণ্ডুলিপির মোট শব্দ</mat-label>-->
+<!--            <mat-form-field appearance="outline">-->
+<!--                <input formControlName="manuScriptWords" matInput required />-->
+<!--                <mat-error>This field is required.</mat-error>-->
+<!--            </mat-form-field>-->
+<!--        </div>-->
+
+<!--      <div class="from">-->
+<!--            <mat-label>Message</mat-label>-->
+<!--            <mat-form-field appearance="outline">-->
+<!--                <input formControlName="manuScriptContents" matInput required />-->
+<!--                <mat-error>This field is required.</mat-error>-->
+<!--            </mat-form-field>-->
+<!--        </div>-->
+
+      <mat-form-field  appearance="outline" class="field m-100 first-name-from">
+        <mat-label>নাম</mat-label>
+        <input matInput placeholder="আপনার নাম লিখুন" type="text" value="" formControlName="name" required>
+        <mat-error>This Field is Required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field m-100 first-name-from">
+        <mat-label>জন্মতারিখ</mat-label>
+        <input matInput formControlName="releasedAt" [matDatepicker]="releasedAtPicker" placeholder="আপনার জন্মতারিখ লিখুন" formControlName="birthDayDate">
+        <mat-datepicker-toggle matPrefix [for]="releasedAtPicker">
+          <mat-icon matDatepickerToggleIcon>
+            calendar_month
+          </mat-icon>
+        </mat-datepicker-toggle>
+        <mat-datepicker #releasedAtPicker>
+        </mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field  appearance="outline" class="field m-100">
+        <mat-label>পেশা</mat-label>
+        <input matInput placeholder="আপনার পেশা লিখুন" type="text" value="" formControlName="profession" required>
+        <mat-error>This Field is Required</mat-error>
+      </mat-form-field>
+
+
+      <div class="form-input name-from">
+        <mat-form-field  appearance="outline" class="field m-100 first-name-from">
+          <mat-label>মোবাইল নম্বর</mat-label>
+          <input matInput placeholder="আপনার মোবাইল নম্বর লিখুন" type="number" digitOnly value="" formControlName="phone" required>
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field  appearance="outline" class="field m-100">
+          <mat-label>ইমেইল</mat-label>
+          <input matInput placeholder="আপনার ইমেইল লিখুন" type="email" value="" formControlName="email" required>
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-input">
+        <mat-form-field appearance="outline" class="field m-100">
+          <mat-label>স্থায়ী ঠিকানা</mat-label>
+          <input matInput placeholder="আপনার ঠিকানা লিখুন" type="text" value="" formControlName="address" required>
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-input name-from">
+        <mat-form-field  appearance="outline" class="field m-100 first-name-from">
+          <mat-label>পাণ্ডুলিপির নাম</mat-label>
+          <input matInput placeholder="আপনার পাণ্ডুলিপির নাম লিখুন" type="text" digitOnly value="" formControlName="manuScriptName" required>
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field  appearance="outline" class="field m-100">
+          <mat-label>পাণ্ডুলিপির মোট শব্দ</mat-label>
+          <input matInput placeholder="পাণ্ডুলিপির মোট শব্দ" type="email" value="" formControlName="manuScriptWords" required>
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-input name-from">
+<!--        <mat-form-field  appearance="outline" class="field m-100 first-name-from">-->
+<!--          <mat-label>পাণ্ডুলিপির বিষয়বস্তু</mat-label>-->
+<!--          <mat-select formControlName="manuScriptContents">-->
+<!--            <mat-option value="Facebook">Facebook</mat-option>-->
+<!--            <mat-option value="LinkedIn">LinkedIn</mat-option>-->
+<!--            <mat-option value="WhatsApp">WhatsApp</mat-option>-->
+<!--          </mat-select>-->
+<!--          <mat-error>This field is required.</mat-error>-->
+<!--        </mat-form-field>-->
+
+        <mat-form-field appearance="outline" class="field m-100 first-name-from">
+          <mat-label>পাণ্ডুলিপির বিষয়বস্তু</mat-label>
+          <input matInput placeholder="লিখুন" type="text" value="" formControlName="manuScriptContents">
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+
+        <!--        <div class="dropdown">-->
+        <!--          <input list="browsers" name="browser">-->
+        <!--          <datalist id="browsers">-->
+        <!--            <option *ngFor="let opt of listOfOptions" [value]="opt" >-->
+        <!--          </datalist>-->
+        <!--        </div>-->
+        <div class="dropdown field m-100">
+          <label>
+            <input list="browsers" name="myBrowser" placeholder="টার্গেটকৃত পাঠকশ্রেণী"
+                   formControlName="targrtReaderClasses" /></label>
+          <datalist id="browsers">
+            <option value="সাধারণ মানের">
+            <option value="মধ্যম মানের">
+            <option value="অগ্রসর মানের">
+            <option value="কিশোর-তরুণ">
+            <option value="শিশু">
+            <option value="অন্য কিছু হলে লিখুন">
+          </datalist>
+        </div>
+
+<!--        <mat-form-field  appearance="outline" class="field m-100">-->
+<!--          <mat-label>টার্গেটকৃত পাঠকশ্রেণী</mat-label>-->
+<!--          <mat-select formControlName="targrtReaderClasses">-->
+<!--            <mat-option value="Facebook">Facebook</mat-option>-->
+<!--            <mat-option value="LinkedIn">LinkedIn</mat-option>-->
+<!--            <mat-option value="WhatsApp">WhatsApp</mat-option>-->
+<!--          </mat-select>-->
+<!--          <mat-error>This field is required.</mat-error>-->
+<!--        </mat-form-field>-->
+      </div>
+
+      <div class="form-input">
+        <mat-form-field appearance="outline" class="field m-100" >
+          <mat-label>পাণ্ডুলিপি সারাংশ লিখুন (২০০ শব্দের মধ্যে)</mat-label>
+          <textarea matInput cols="10" rows="7" placeholder="" formControlName="manuScriptSummery" ></textarea>
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-input">
+        <mat-form-field appearance="outline" class="field m-100" >
+          <mat-label>আপনার পাণ্ডুলিপিটি বাজারের অন্য বই থেকে কেন আলাদা? (২০০ শব্দের মধ্যে লিখুন)</mat-label>
+          <textarea matInput cols="10" rows="7" placeholder="" formControlName="manuScriptComment" ></textarea>
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-input">
+        <mat-form-field appearance="outline" class="field m-100">
+          <mat-label>পাণ্ডুলিপি আপলোড</mat-label>
+          <input matInput placeholder="পাণ্ডুলিপি আপলোড" type="url" value="" formControlName="docFile" >
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <!---form-input-->
+      <div class="form-input">
+        <mat-form-field appearance="outline" class="field m-100">
+          <mat-label>পাণ্ডুলিপি লিংক দিন</mat-label>
+          <input matInput placeholder="Enter your  Manuscript Link" type="url" value="" formControlName="manuScriptLink" >
+          <mat-error>This Field is Required</mat-error>
+        </mat-form-field>
+      </div>
+
+
+
+        <div class="btn" id="cancel-btn">
+<!--            <button mat-raised-button type="submit" class="btn-submit">-->
+<!--                {{ id ? "Update" : "Submit" }}-->
+<!--            </button>-->
+            <button type="button" [routerLink]="['/manuscript/all-manuscript']" mat-raised-button class="btn-submit color">
+                Cancel
+            </button>
+        </div>
+    </form>
+</section>

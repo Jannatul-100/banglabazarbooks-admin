@@ -1,0 +1,96 @@
+<section class="admin-data-sec">
+  <div class="top-data-header">
+    <div class="title">
+      <h2>Bulk Product Upload</h2>
+      <p>Upload CSV/XLSX file. First sheet will be imported.</p>
+    </div>
+  </div>
+
+  <div class="upload-card">
+    <div class="actions top-actions">
+      <button mat-stroked-button color="accent" type="button" (click)="downloadTemplate()">
+        Download Template (CSV)
+      </button>
+    </div>
+
+    <input type="file" accept=".csv,.xlsx,.xls" (change)="onFileSelected($event)" />
+    <p *ngIf="fileName">Selected: {{ fileName }}</p>
+    <p *ngIf="rows.length">Rows found: {{ rows.length }}</p>
+
+    <mat-checkbox [(ngModel)]="overwrite">
+      Overwrite existing products (match by slug/name/nameEn)
+    </mat-checkbox>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="upload()">
+        Upload Products
+      </button>
+    </div>
+  </div>
+
+  <div class="mapping-help">
+    <h3>Supported columns (Bangla + English)</h3>
+    <p><strong>Required:</strong> <code>name</code> (Bangla), <code>category</code> or <code>category_en</code></p>
+
+    <p><strong>Product (BN/EN):</strong>
+      <code>name</code>, <code>name_en</code>, <code>tagline</code>, <code>tagline_en</code>,
+      <code>edition</code>, <code>edition_en</code>
+    </p>
+
+    <p><strong>Category / Subcategory (BN/EN):</strong>
+      <code>category</code>, <code>category_en</code>, <code>sub_category</code>, <code>sub_category_en</code>
+    </p>
+
+    <p><strong>Publisher (BN/EN):</strong>
+      <code>publisher</code>, <code>publisher_en</code>
+    </p>
+
+    <p><strong>Author (BN/EN):</strong>
+      <code>authors</code>, <code>authors_en</code>
+      — multiple: <code>হুমায়ূন আহমেদ|অনিসুল হক</code> and <code>Humayun Ahmed|Anisul Haque</code>
+    </p>
+
+    <p><strong>Translator (BN/EN):</strong>
+      <code>translator_name</code>, <code>translator_name_en</code>
+      — multiple: pipe <code>|</code> separator
+    </p>
+
+    <p><strong>Pricing:</strong>
+      <code>regular_price</code> (MRP), <code>sale_price</code> (final selling price).
+      Percentage discount auto-calculated from both prices.
+      Example: regular 200, sale 130 → 35% discount.
+    </p>
+
+    <p><strong>Other:</strong>
+      <code>tags</code>, <code>slug</code>, <code>sku</code>, <code>cost_price</code>,
+      <code>quantity</code>, <code>status</code> (<code>publish</code> or <code>Published</code>),
+      <code>free_delivery</code>, <code>images</code>,
+      <code>description</code>, <code>short_description</code>, <code>isbn</code>, <code>pdf_url</code>
+    </p>
+
+    <p class="hint">
+      Missing category/publisher/author/subcategory will be auto-created with Bangla + English names.
+      <strong>authors</strong> column must be filled — otherwise author name will not show on the website.
+    </p>
+  </div>
+
+  <div class="result" *ngIf="result">
+    <h3>Import Result</h3>
+    <p>Total Rows: {{ result.totalRows }}</p>
+    <p>Created: {{ result.created }}</p>
+    <p>Updated: {{ result.updated }}</p>
+    <p>Skipped: {{ result.skipped }}</p>
+    <p>Failed: {{ result.failed }}</p>
+    <p *ngIf="result.missingAuthors">Missing authors: {{ result.missingAuthors }} row(s)</p>
+    <p *ngIf="result.statusNormalized">Status normalized to publish: {{ result.statusNormalized }} row(s)</p>
+
+    <div class="errors" *ngIf="result.errors?.length">
+      <h4>Row Errors</h4>
+      <p *ngFor="let err of result.errors">Row {{ err.row }}: {{ err.message }}</p>
+    </div>
+  </div>
+
+  <ngx-spinner bdColor="rgba(0, 0, 0, 0.5)" size="medium" color="#fff" type="ball-atom" [fullScreen]="false">
+    <p style="color: white"> Uploading... </p>
+  </ngx-spinner>
+</section>

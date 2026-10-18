@@ -1,0 +1,31 @@
+<div class="main-area">
+  <h2 *ngIf="courierMethods?.length">Select Your Courier</h2>
+
+  <div class="courier-list" *ngIf="courierMethods && courierMethods.length; else noCourier">
+    <div
+      class="courier-card"
+      *ngFor="let courier of courierMethods"
+      [class.selected]="courier === selectedCourier"
+      (click)="selectCourier(courier)"
+    >
+      <div class="checkmark" *ngIf="courier === selectedCourier">
+        <mat-icon>check</mat-icon>
+      </div>
+      <div class="provider-info">
+        <mat-icon class="provider-icon">local_shipping</mat-icon>
+        <p>{{ courier.providerName }}</p>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noCourier>
+    <p class="no-provider">No courier provider found. Please configure providers in Settings.</p>
+  </ng-template>
+
+  <div class="actions">
+    <button mat-button color="warn" (click)="cancel()">Cancel</button>
+    <button *ngIf="courierMethods?.length" mat-raised-button color="primary" (click)="confirm()" [disabled]="!selectedCourier">
+      Confirm & Send
+    </button>
+  </div>
+</div>

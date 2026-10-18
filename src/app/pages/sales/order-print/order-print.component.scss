@@ -1,0 +1,86 @@
+.admin-print-page {
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+  }
+
+  .preview-info {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #666;
+    strong {
+      color: #000;
+    }
+  }
+
+  .order-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+
+    .order-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 16px;
+      border: 1px solid #eee;
+
+      .card-header {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed #eee;
+
+        .id {
+          font-weight: bold;
+          color: #2196f3;
+          font-size: 18px;
+        }
+        .name {
+          font-weight: 500;
+          color: #333;
+        }
+        .total {
+          font-weight: bold;
+          color: #f44336;
+          margin-top: 4px;
+        }
+      }
+
+      .card-body {
+        p {
+          margin: 4px 0;
+          font-size: 14px;
+          color: #555;
+        }
+      }
+    }
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 100px 0;
+    color: #999;
+  }
+}

@@ -1,0 +1,74 @@
+<!--<div  id="payment-type-list-print-table" >-->
+<!--  <table >-->
+<!--    <tr>-->
+<!--      <th>Name</th>-->
+<!--      <th>Purchase Price</th>-->
+<!--      <th>Sales Price</th>-->
+<!--    </tr>-->
+<!--    <tr *ngFor="let data of products">-->
+<!--      <td>-->
+<!--        {{ data?.name }}-->
+<!--      </td>-->
+<!--      <td>-->
+<!--        {{ data?.purchasePrice}}-->
+<!--      </td>-->
+
+<!--      <td>-->
+<!--        {{ data?.salePrice}}-->
+<!--      </td>-->
+<!--    </tr>-->
+<!--  </table>-->
+<!--</div>-->
+
+
+
+
+<div class="my-table" >
+  <div>
+<!--    <h1 style="font-size: 16px; margin-bottom: 0">SALES RECORDS</h1>-->
+   <div class="header">
+     <p style="font-size: 14px">Users List</p>
+     <p style="font-size: 14px">Date: {{myDate | date}}</p>
+   </div>
+  </div>
+  <table style="
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 40px;
+    font-size: 18px;"
+  >
+    <tr>
+      <th style="width: 25px">S/N</th>
+
+      <th>Name</th>
+
+      <th style="width: 60px">Phone</th>
+
+      <th>Email</th>
+
+
+
+    <tr *ngFor="let data of products; let i= index">
+
+      <td>
+        {{ i+1 }}
+      </td>
+      <td>
+        {{ data?.name }}
+      </td>
+
+      <td>
+        {{  data?.phoneNo || "-" }}
+      </td>
+
+
+     <td>
+       ৳{{data?.email || '-'}}
+      </td>
+
+  </table>
+
+</div>
+
+

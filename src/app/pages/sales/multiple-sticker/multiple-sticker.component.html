@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<div *ngIf="!isLoading">
+    <div class="actions">
+        <button mat-raised-button color="primary" (click)="printInvoice()" class="print-button">
+            <mat-icon>print</mat-icon>
+            Print
+        </button>
+    </div>
+
+    <div class="preview-container" id="preview-container">
+        <ng-container *ngFor="let invoice of invoices; let i = index">
+            <section class="invoice-page" [attr.data-order-id]="invoice?.orderId">
+                <div class="invoice-wrapper">
+                    <div id="print-section" class="invoice-container">
+                        <div class="data">
+                            <!-- From Section -->
+                            <div class="row">
+                                <img class="logo" src="/assets/images/logo/logo2.png" alt="image" loading="lazy">
+                                <div class="from-section">
+                                    <div class="bold">Shipped From:</div>
+                                    <div class="small">Bangla Bazar Books</div>
+                                    <div class="small">38, Bangla Bazar(Opposite of Kajol Brothers) ,
+                                        Dhaka -1100</div>
+                                    <div class="small">Mobile: 01784093014</div>
+                                </div>
+                            </div>
+                            <div class="top-area" style="border: 1px solid #000000; margin-bottom: 10px;">
+                                <div class=""
+                                    style="padding: 2px 0; text-align: center; border-right: 1px solid #000000;">Order
+                                    Id:
+                                    {{ invoice?.orderId }}</div>
+                                <div class="" style="padding: 2px 0; text-align: center;">{{ invoice?.phoneNo }}
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; margin-bottom: 10px; border: 2px solid #000; padding: 5px;" *ngIf="invoice?.courierData?.providerName === 'Sundarban Courier'">
+                                <h2 style="margin: 0; font-weight: bold; font-size: 24px;">Sundarban Courier</h2>
+                            </div>
+                            <div style="text-align: center; margin-bottom: 10px; border: 2px solid #000; padding: 5px;" *ngIf="invoice?.courierData?.providerName !== 'Sundarban Courier'">
+                                <h2 style="margin: 0; font-weight: bold; font-size: 24px;">Cash on Delivery</h2>
+                            </div>
+
+                            <!-- To Section -->
+                            <div class="row">
+                                <div class="to-section">
+                                    <div class="bold">Bangla Bazar Books</div>
+
+                                    <div class="bold">Shipped To: {{ invoice?.name }}</div>
+                                    <div>Phone: {{ invoice?.phoneNo }}</div>
+                                    <div>Address: {{ invoice?.shippingAddress }}</div>
+                                    <p *ngIf="invoice?.note">Note: {{ invoice?.note }}</p>
+
+                                </div>
+                            </div>
+                            <div class="product-infos" style="margin-top: 10px;">
+                                <table class="table-products">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40%">Product</th>
+                                            <th style="width: 16%">Image</th>
+                                            <th style="width: 17%">Price</th>
+                                            <th style="width: 9%">Qty</th>
+                                            <th style="width: 18%">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let order of invoice?.orderedItems">
+                                            <td>{{ order?.name }}</td>
+                                            <td>
+                                                <img *ngIf="order?.image" [src]="order?.image" alt="" />
+                                                <span *ngIf="!order?.image">-</span>
+                                            </td>
+                                            <td>৳{{ order?.salePrice | number: '':'bn' }}</td>
+                                            <td>{{ order?.quantity | number: '':'bn' }}</td>
+                                            <td>৳{{ (order?.quantity * order?.salePrice) | number: '':'bn' }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Summary Section -->
+                            <div class="totals-container">
+                                <table class="table-totals">
+                                    <tr>
+                                        <td>SubTotal :</td>
+                                        <td class="text-right">৳{{ invoice?.subTotal | number: '':'bn' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Delivery Charge :</td>
+                                        <td class="text-right">৳{{ invoice?.deliveryCharge | number: '':'bn' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Discount Amount :</td>
+                                        <td class="text-right">-৳{{ (invoice?.subTotal + invoice?.deliveryCharge - invoice?.grandTotal) | number: '':'bn' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Grand Total :</td>
+                                        <td class="text-right">৳{{ invoice?.grandTotal | number: '':'bn' }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </ng-container>
+    </div>
+</div>
+
+<div *ngIf="isLoading" style="text-align: center; margin-top: 50px;">
+    Loading...
+</div>

@@ -1,0 +1,261 @@
+<div class="container-fluid py-4 fb-catalog-wrapper">
+  <!-- Back Button -->
+  <div class="mb-3">
+    <a routerLink="/customization/setting" class="back-link">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Back to Settings</span>
+    </a>
+  </div>
+
+  <!-- Header Card -->
+  <div class="header-card mb-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="fb-icon-circle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 50 50" fill="#ffffff">
+            <path d="M25,3C12.85,3,3,12.85,3,25c0,11.03,8.125,20.137,18.712,21.728V30.831h-5.443v-5.783h5.443v-3.848 c0-6.371,3.104-9.168,8.399-9.168c2.536,0,3.877,0.188,4.512,0.274v5.048h-3.612c-2.248,0-3.033,2.131-3.033,4.533v3.161h6.588 l-0.894,5.783h-5.694v15.944C38.716,45.318,47,36.137,47,25C47,12.85,37.15,3,25,3z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="title mb-1">Meta Facebook Catalog Feed</h2>
+          <p class="subtitle mb-0">Automatically sync your books with Facebook &amp; Instagram Shop, Dynamic Product Ads, and Meta Commerce Manager.</p>
+        </div>
+      </div>
+
+      <div>
+        <a routerLink="/product/all-product" mat-raised-button color="primary" class="d-flex align-items-center gap-1">
+          <mat-icon>checklist</mat-icon>
+          <span>Select Books in All Products</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Settings Card -->
+  <div class="card p-4 mb-4 shadow-sm border-0">
+    <form [formGroup]="dataForm" (ngSubmit)="onSubmit()">
+      <!-- Toggle Row -->
+      <div class="d-flex align-items-center justify-content-between p-3 rounded bg-light mb-4 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3">
+          <mat-checkbox
+            formControlName="isEnableFacebookCatalog"
+            (change)="onToggle()"
+            color="primary"
+            class="fw-semibold">
+            Enable Meta Facebook Catalog Feed
+          </mat-checkbox>
+        </div>
+
+        <div class="status-badge" [class.badge-active]="dataForm.get('isEnableFacebookCatalog')?.value" [class.badge-inactive]="!dataForm.get('isEnableFacebookCatalog')?.value">
+          <mat-icon>{{ dataForm.get('isEnableFacebookCatalog')?.value ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>{{ dataForm.get('isEnableFacebookCatalog')?.value ? 'Catalog Live & Enabled' : 'Catalog Disabled' }}</span>
+        </div>
+      </div>
+
+      <!-- Content when enabled -->
+      <div *ngIf="dataForm.get('isEnableFacebookCatalog')?.value" class="feed-details-sec">
+        <!-- Stats Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <div class="stat-box">
+              <div class="stat-icon bg-primary-soft">
+                <mat-icon>menu_book</mat-icon>
+              </div>
+              <div>
+                <span class="stat-label">Books Selected for Catalog</span>
+                <h3 class="stat-value text-primary">{{ catalogCount }}</h3>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="stat-box">
+              <div class="stat-icon bg-success-soft">
+                <mat-icon>library_books</mat-icon>
+              </div>
+              <div>
+                <span class="stat-label">Total Published Books</span>
+                <h3 class="stat-value text-success">{{ totalPublished }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feed URLs Section -->
+        <div class="feed-urls-card p-3 rounded mb-4">
+          <h4 class="feed-section-title">
+            <mat-icon>link</mat-icon>
+            Live Product Feed URLs
+          </h4>
+          <p class="feed-section-desc">
+            Copy either URL below and paste it into Meta Commerce Manager under <strong>Data sources &gt; Data feed</strong>.
+          </p>
+
+          <!-- CSV Feed URL -->
+          <div class="url-group mb-3">
+            <label class="url-label">
+              <strong>CSV Data Feed URL</strong> (Recommended by Meta):
+            </label>
+            <div class="input-copy-row">
+              <mat-form-field appearance="outline" class="w-100 no-subscript">
+                <input matInput [value]="feedCsvUrl" readonly>
+              </mat-form-field>
+              <button mat-flat-button color="primary" type="button" class="copy-btn" (click)="onCopy(feedCsvUrl, 'CSV Feed URL')">
+                <mat-icon>content_copy</mat-icon>
+                <span>Copy</span>
+              </button>
+              <a [href]="feedCsvUrl" target="_blank" mat-stroked-button color="primary" class="preview-btn">
+                <mat-icon>open_in_new</mat-icon>
+              </a>
+            </div>
+          </div>
+
+          <!-- XML Feed URL -->
+          <div class="url-group">
+            <label class="url-label">
+              <strong>RSS / XML Data Feed URL</strong> (Standard Google/Meta format):
+            </label>
+            <div class="input-copy-row">
+              <mat-form-field appearance="outline" class="w-100 no-subscript">
+                <input matInput [value]="feedXmlUrl" readonly>
+              </mat-form-field>
+              <button mat-flat-button color="primary" type="button" class="copy-btn" (click)="onCopy(feedXmlUrl, 'XML Feed URL')">
+                <mat-icon>content_copy</mat-icon>
+                <span>Copy</span>
+              </button>
+              <a [href]="feedXmlUrl" target="_blank" mat-stroked-button color="primary" class="preview-btn">
+                <mat-icon>open_in_new</mat-icon>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Selector Section -->
+        <div class="product-selection-card p-4 rounded mb-4">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <div>
+              <h4 class="selection-title mb-1">
+                <mat-icon>library_add_check</mat-icon>
+                Selected Books in Facebook Catalog ({{ catalogCount }})
+              </h4>
+              <p class="selection-desc mb-0">
+                Only the books selected below will be included in the Facebook Catalog feed.
+              </p>
+            </div>
+
+            <div class="d-flex gap-2">
+              <a routerLink="/product/all-product" mat-stroked-button color="primary">
+                <mat-icon>playlist_add_check</mat-icon>
+                Bulk Select in All Products
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Search to Add Books -->
+          <div class="search-add-box p-3 rounded mb-3">
+            <label class="form-label fw-semibold small text-muted">Quick Search &amp; Add Book to Catalog:</label>
+            <div class="d-flex gap-2">
+              <mat-form-field appearance="outline" class="w-100 search-field">
+                <mat-label>Type book title or author name...</mat-label>
+                <input matInput [(ngModel)]="searchQuery" [ngModelOptions]="{standalone: true}" (keyup.enter)="onSearchBooks()">
+                <button *ngIf="searchQuery" mat-icon-button matSuffix type="button" (click)="searchQuery=''; searchResults=[]">
+                  <mat-icon>clear</mat-icon>
+                </button>
+              </mat-form-field>
+              <button mat-flat-button color="primary" type="button" class="search-btn" (click)="onSearchBooks()" [disabled]="isSearching">
+                <mat-icon>search</mat-icon>
+                <span>Search</span>
+              </button>
+            </div>
+
+            <!-- Search Results Dropdown / List -->
+            <div *ngIf="searchResults.length" class="search-results-list mt-2 border rounded bg-white shadow-sm">
+              <div *ngFor="let item of searchResults" class="search-item d-flex align-items-center justify-content-between p-2 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                  <img [src]="item.images?.length ? item.images[0] : 'assets/images/placeholder.png'" class="search-item-img" alt="">
+                  <div>
+                    <div class="fw-semibold small">{{ item.name }}</div>
+                    <div class="text-muted extra-small">৳{{ item.salePrice }} • {{ item.publisher?.name || 'Banglabazar' }}</div>
+                  </div>
+                </div>
+
+                <div>
+                  <button *ngIf="!item.isFacebookCatalog" mat-stroked-button color="primary" type="button" class="btn-sm" (click)="addBookToCatalog(item)">
+                    <mat-icon>add</mat-icon> Add to Catalog
+                  </button>
+                  <span *ngIf="item.isFacebookCatalog" class="badge bg-success-subtle text-success small">
+                    <mat-icon style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon> Already in Catalog
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Catalog Books Table -->
+          <div class="table-responsive bg-white rounded border" *ngIf="catalogProducts.length">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 60px;">Image</th>
+                  <th>Book Title</th>
+                  <th>Publisher</th>
+                  <th>Price</th>
+                  <th style="width: 120px; text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of catalogProducts">
+                  <td>
+                    <img [src]="item.images?.length ? item.images[0] : 'assets/images/placeholder.png'" class="table-book-img" alt="">
+                  </td>
+                  <td>
+                    <span class="fw-semibold">{{ item.name }}</span>
+                  </td>
+                  <td class="text-muted small">{{ item.publisher?.name || '-' }}</td>
+                  <td class="fw-semibold">৳{{ item.salePrice }}</td>
+                  <td style="text-align: center;">
+                    <button mat-icon-button color="warn" type="button" matTooltip="Remove from Facebook Catalog" (click)="removeBookFromCatalog(item)">
+                      <mat-icon>delete_outline</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="!catalogProducts.length && !isCatalogLoading" class="text-center p-4 bg-light rounded text-muted">
+            <mat-icon style="font-size: 36px; width: 36px; height: 36px;" class="mb-2">playlist_remove</mat-icon>
+            <p class="mb-2">No books are currently selected for the Facebook Catalog.</p>
+            <a routerLink="/product/all-product" class="btn btn-sm btn-outline-primary">
+              Go to Product List to select books
+            </a>
+          </div>
+        </div>
+
+        <!-- Meta Setup Instructions -->
+        <div class="instructions-card p-4 rounded">
+          <h4 class="inst-title">
+            <mat-icon>help_outline</mat-icon>
+            How to set up in Meta Commerce Manager
+          </h4>
+          <ol class="inst-steps">
+            <li>
+              Go to <strong><a href="https://business.facebook.com/commerce" target="_blank" rel="noopener">Meta Commerce Manager</a></strong> and select your business catalog.
+            </li>
+            <li>
+              In the left sidebar, navigate to <strong>Catalog &gt; Data sources</strong> and click <strong>Add items</strong>.
+            </li>
+            <li>
+              Choose <strong>Data feed</strong> and click <strong>Next</strong>.
+            </li>
+            <li>
+              Select <strong>Scheduled feed</strong>, paste the <strong>CSV Data Feed URL</strong> above, and set automatic refresh frequency (e.g. <em>Daily</em>).
+            </li>
+            <li>
+              Set default currency to <strong>BDT</strong> and save. Meta will automatically sync all your chosen books into your Facebook &amp; Instagram catalog!
+            </li>
+          </ol>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

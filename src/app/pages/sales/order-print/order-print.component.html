@@ -1,0 +1,43 @@
+<section class="admin-print-page">
+  <div class="header">
+    <h2>Multiple Order Printing</h2>
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="generatePdf()" [disabled]="orders.length === 0">
+        <mat-icon>print</mat-icon>
+        Print Invoices
+      </button>
+      <button mat-stroked-button [routerLink]="['/sales/all-orders']">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Orders
+      </button>
+    </div>
+  </div>
+
+  <div class="preview-info" *ngIf="!isLoading">
+    <p>Loaded <strong>{{ orders.length }}</strong> orders for printing.</p>
+  </div>
+
+  <div class="order-list" *ngIf="!isLoading">
+    <div class="order-card" *ngFor="let order of orders">
+      <div class="card-header">
+        <span class="id">Order #{{ order.orderId }}</span>
+        <span class="name">{{ order.name }}</span>
+        <span class="total">৳{{ order.grandTotal }}</span>
+      </div>
+      <div class="card-body">
+        <p><strong>Phone:</strong> {{ order.phoneNo }}</p>
+        <p><strong>Address:</strong> {{ order.shippingAddress }}</p>
+        <p><strong>Items:</strong> {{ order.orderedItems.length }} products</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!isLoading && orders.length === 0">
+    <p>No orders found for the selected IDs.</p>
+  </div>
+
+</section>
+
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.5)" size="medium" color="#fff" type="ball-atom" [fullScreen]="false">
+  <p style="color: white"> Fetching orders... </p>
+</ngx-spinner>

@@ -1,0 +1,205 @@
+
+<div style="position: relative">
+
+  <div class="header-dialog">
+    <h1>Order offer</h1>
+  </div>
+
+  <form [formGroup]="dataForm" (ngSubmit)="onSubmit()" fxLayout="column" fxLayoutAlign="space-around center">
+
+    <div>
+      <h3>First Time Order Offer</h3>
+    </div>
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Discount Type</mat-label>
+      <mat-select formControlName="firstOrderDiscountType">
+        <mat-option *ngFor="let data of discountTypes" [value]="data.value">
+          {{ data.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error>This field is required.</mat-error>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>First Order Discount Amount</mat-label>
+      <input formControlName="firstOrderDiscountAmount" matInput placeholder="Enter discount amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>First Order Min Amount</mat-label>
+      <input formControlName="firstOrderMinAmount" matInput placeholder="Enter minimum amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+
+    <div>
+      <h3>Amount Order Offer 1</h3>
+    </div>
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Discount Type</mat-label>
+      <mat-select formControlName="amountOrderDiscountType">
+        <mat-option *ngFor="let data of discountTypes" [value]="data.value">
+          {{ data.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error>This field is required.</mat-error>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Order Discount Amount</mat-label>
+      <input formControlName="amountOrderDiscountAmount" matInput placeholder="Enter discount amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Order Min Amount</mat-label>
+      <input formControlName="amountOrderMinAmount" matInput placeholder="Enter minimum amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+
+    <div>
+      <h3>Amount Order Offer 2</h3>
+    </div>
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Discount Type</mat-label>
+      <mat-select formControlName="amount2OrderDiscountType">
+        <mat-option *ngFor="let data of discountTypes" [value]="data.value">
+          {{ data.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error>This field is required.</mat-error>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Order Discount Amount</mat-label>
+      <input formControlName="amount2OrderDiscountAmount" matInput placeholder="Enter discount amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Order Min Amount</mat-label>
+      <input formControlName="amount2OrderMinAmount" matInput placeholder="Enter minimum amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+
+    <div>
+      <h3>Amount Order Offer 3</h3>
+    </div>
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Discount Type</mat-label>
+      <mat-select formControlName="amount3OrderDiscountType">
+        <mat-option *ngFor="let data of discountTypes" [value]="data.value">
+          {{ data.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error>This field is required.</mat-error>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Order Discount Amount</mat-label>
+      <input formControlName="amount3OrderDiscountAmount" matInput placeholder="Enter discount amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Order Min Amount</mat-label>
+      <input formControlName="amount3OrderMinAmount" matInput placeholder="Enter minimum amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+
+
+    <div>
+      <h3>Apps Order Offer </h3>
+    </div>
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Discount Type</mat-label>
+      <mat-select formControlName="appsOrderDiscountType">
+        <mat-option *ngFor="let data of discountTypes" [value]="data.value">
+          {{ data.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error>This field is required.</mat-error>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Order Discount Amount</mat-label>
+      <input formControlName="appsOrderDiscountAmount" matInput placeholder="Enter discount amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Order Min Amount</mat-label>
+      <input formControlName="appsOrderMinAmount" matInput placeholder="Enter minimum amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+
+    <div>
+      <h3>Month Order Discount</h3>
+    </div>
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Enter Month Order Value</mat-label>
+      <input formControlName="monthOrderValue" matInput placeholder="Enter Month Order Value" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Discount Type</mat-label>
+      <mat-select formControlName="monthOrderDiscountType">
+        <mat-option *ngFor="let data of discountTypes" [value]="data.value">
+          {{ data.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error>This field is required.</mat-error>
+    </mat-form-field>
+
+
+    <mat-form-field appearance="outline" class="w-100 px-1">
+      <mat-label>Order Discount Amount</mat-label>
+      <input formControlName="monthOrderDiscountAmount" matInput placeholder="Enter discount amount" type="number"
+             pattern="^\d+(\.\d{1,2})?$" digitOnly/>
+      <mat-error>This field is required</mat-error>
+    </mat-form-field>
+
+<!--    <mat-form-field appearance="outline" class="w-100 px-1">-->
+<!--      <mat-label>Order Min Amount</mat-label>-->
+<!--      <input formControlName="monthOrderMinAmount" matInput placeholder="Enter minimum amount" type="number"-->
+<!--             pattern="^\d+(\.\d{1,2})?$" digitOnly/>-->
+<!--      <mat-error>This field is required</mat-error>-->
+<!--    </mat-form-field>-->
+
+
+    <button class="submit-btn" mat-raised-button color="accent" type="submit">
+      <mat-icon>done</mat-icon>
+      Save Data
+    </button>
+  </form>
+</div>
+
+
+<!-- LOADING TEMPLATE -->
+<ngx-spinner style="width: 100vw; height: 100vh" bdColor="rgba(0,0,0,0.25)" size="medium" color="#fff"
+             type="ball-clip-rotate" [fullScreen]="true">
+  <p style="color: white"> Loading... </p>
+</ngx-spinner>

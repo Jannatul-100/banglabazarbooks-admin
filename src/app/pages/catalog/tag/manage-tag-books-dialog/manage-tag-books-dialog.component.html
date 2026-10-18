@@ -1,0 +1,112 @@
+<div class="manage-dialog-container">
+  <!-- HEADER -->
+  <div class="dialog-header">
+    <div class="header-info">
+      <mat-icon class="tag-icon">local_offer</mat-icon>
+      <div>
+        <h2>Manage Books</h2>
+        <p class="tag-name">Tag: <strong>{{ tagName }}</strong></p>
+      </div>
+    </div>
+    <button mat-icon-button (click)="close()" matTooltip="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- ADD BOOKS PANEL -->
+  <div class="add-panel" *ngIf="showAddPanel">
+    <div class="add-panel-header">
+      <h3><mat-icon>add_circle</mat-icon> Add Books to Tag</h3>
+      <button mat-stroked-button color="warn" (click)="showAddPanel = false">Cancel</button>
+    </div>
+    <input
+      class="search-box"
+      [(ngModel)]="searchTerm"
+      (input)="onSearchChange()"
+      placeholder="🔍 Search books by name..."
+    />
+    <div class="all-products-list" *ngIf="!isLoadingAll; else loadingAll">
+      <div
+        *ngFor="let p of filteredAllProducts"
+        class="product-row selectable"
+        [class.selected]="isSelected(p._id)"
+        (click)="toggleSelectProduct(p._id)"
+      >
+        <mat-checkbox
+          [checked]="isSelected(p._id)"
+          (change)="toggleSelectProduct(p._id)"
+          (click)="$event.stopPropagation()"
+          color="primary"
+        ></mat-checkbox>
+        <img [src]="p.images?.[0] || 'assets/img/no-image.webp'" alt="" class="book-thumb" />
+        <div class="product-info">
+          <span class="product-name">{{ p.name }}</span>
+          <span class="product-meta" *ngIf="p.author?.length">{{ p.author[0]?.name }}</span>
+        </div>
+        <span class="product-price" *ngIf="p.salePrice">৳{{ p.salePrice }}</span>
+      </div>
+      <div class="empty-state" *ngIf="filteredAllProducts.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <p>No books found</p>
+      </div>
+    </div>
+    <ng-template #loadingAll>
+      <div class="loading-state"><mat-spinner diameter="32"></mat-spinner></div>
+    </ng-template>
+    <div class="add-action-bar" *ngIf="selectedProductIds.length">
+      <button mat-raised-button color="primary" (click)="addSelectedProducts()">
+        <mat-icon>add</mat-icon>
+        Add {{ selectedProductIds.length }} Book(s) to Tag
+      </button>
+    </div>
+  </div>
+
+  <!-- CURRENT BOOKS LIST -->
+  <div class="current-books-section" *ngIf="!showAddPanel">
+    <div class="section-header">
+      <span class="count-badge">{{ filteredProducts.length }} / {{ products.length }} book(s) in this tag</span>
+      <button mat-raised-button color="primary" (click)="openAddPanel()">
+        <mat-icon>add</mat-icon>
+        Add Books
+      </button>
+    </div>
+
+    <input
+      class="search-box"
+      *ngIf="products.length > 5"
+      [(ngModel)]="currentSearchTerm"
+      placeholder="🔍 Filter current books in this tag..."
+    />
+
+    <div class="products-list" *ngIf="!isLoadingProducts; else loading">
+      <div *ngFor="let p of filteredProducts" class="product-row">
+        <img [src]="p.images?.[0] || 'assets/img/no-image.webp'" alt="" class="book-thumb" />
+        <div class="product-info">
+          <span class="product-name">{{ p.name }}</span>
+          <span class="product-meta" *ngIf="p.author?.length">{{ p.author[0]?.name }}</span>
+          <span class="product-price" *ngIf="p.salePrice">৳{{ p.salePrice }}</span>
+        </div>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="removeProduct(p._id)"
+          matTooltip="Remove from tag"
+        >
+          <mat-icon>remove_circle_outline</mat-icon>
+        </button>
+      </div>
+      <div class="empty-state" *ngIf="products.length === 0">
+        <mat-icon>auto_stories</mat-icon>
+        <p>No books in this tag yet</p>
+        <button mat-stroked-button color="primary" (click)="openAddPanel()">+ Add Books</button>
+      </div>
+    </div>
+    <ng-template #loading>
+      <div class="loading-state"><mat-spinner diameter="32"></mat-spinner></div>
+    </ng-template>
+  </div>
+</div>
+
+<ngx-spinner bdColor="rgba(0,0,0,0.3)" size="medium" color="#fff" type="ball-scale-pulse" [fullScreen]="true">
+  <p style="color: white">Loading...</p>
+</ngx-spinner>

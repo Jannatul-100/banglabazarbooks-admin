@@ -1,0 +1,154 @@
+<section class="admin-data-sec">
+  <div class="top-data-header">
+    <div class="title">
+      <h2>All Newsletter</h2>
+    </div>
+
+    <form class="table-search" #searchForm="ngForm">
+      <input type="text" #searchInput name="searchTerm" autocomplete="off" ngModel placeholder="Search" />
+      <button><i class="fa fa-search"></i></button>
+    </form>
+
+    <div class="action">
+
+
+      <div class="sort">
+        <button mat-raised-button color="primary" [matMenuTriggerFor]="menuSort">
+          Sort By
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #menuSort="matMenu">
+          <button mat-menu-item (click)="sortData({ updatedAt: -1 }, 1)" [class.dropdown-active]="activeSort === 1">
+            Last Last Login
+          </button>
+          <button (click)="sortData({ name: 1 }, 2)" mat-menu-item [class.dropdown-active]="activeSort === 2">
+            Most A-Z
+          </button>
+        </mat-menu>
+      </div>
+
+      <div class="sort">
+        <button mat-raised-button color="primary" [matMenuTriggerFor]="menuShow">
+          {{selectedPagination ? selectedPagination : 'Show News letter'}}
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #menuShow="matMenu">
+          <button mat-menu-item (click)="SelectChange(10)"
+            [class.dropdown-active]="selectedPagination === 10">10</button>
+          <button mat-menu-item (click)="SelectChange(20)"
+            [class.dropdown-active]="selectedPagination === 20">20</button>
+          <button mat-menu-item (click)="SelectChange(30)"
+            [class.dropdown-active]="selectedPagination === 30">30</button>
+          <button mat-menu-item (click)="SelectChange(40)"
+            [class.dropdown-active]="selectedPagination === 40">40</button>
+          <button mat-menu-item (click)="SelectChange(50)"
+            [class.dropdown-active]="selectedPagination === 50">50</button>
+          <button mat-menu-item (click)="SelectChange(60)"
+            [class.dropdown-active]="selectedPagination === 50">60</button>
+          <button mat-menu-item (click)="SelectChange(70)"
+            [class.dropdown-active]="selectedPagination === 50">70</button>
+          <button mat-menu-item (click)="SelectChange(80)"
+            [class.dropdown-active]="selectedPagination === 50">80</button>
+          <button mat-menu-item (click)="SelectChange(100)"
+            [class.dropdown-active]="selectedPagination === 100">100</button>
+          <button mat-menu-item (click)="SelectChange(200)"
+            [class.dropdown-active]="selectedPagination === 200">200</button>
+        </mat-menu>
+      </div>
+
+      <button *ngIf="checkAddPermission" mat-raised-button color="primary" routerLink="/contact/add-newsletter">
+        <mat-icon>add</mat-icon>
+        Add Newsletter
+      </button>
+    </div>
+  </div>
+  <!-- END TOP DATA HEADER -->
+
+  <hr class="center-square" />
+
+  <div class="table-wrapper space">
+    <div class="table-action" [class.dual]="activeSort || filter">
+      <div class="left" *ngIf="activeSort || filter">
+        <button mat-stroked-button color="accent" (click)="onRemoveAllQuery()">
+          <mat-icon>close</mat-icon>
+          Clear FilterData
+        </button>
+      </div>
+
+      <div class="right" *ngIf="selectedIds && selectedIds.length">
+
+
+        <button *ngIf="checkDeletePermission" mat-stroked-button color="warn" (click)="openConfirmDialog('delete')"
+          matTooltip="Delete">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+    <!-- END Table Action -->
+
+    <table>
+      <tr>
+        <th class="t-checkbox" class="mat-check">
+          <mat-checkbox #matCheckbox (change)="onAllSelectChange($event)"></mat-checkbox>
+        </th>
+        <th>Email</th>
+        <th>Mobile Number</th>
+        <th>Created At</th>
+        <th>Action</th>
+      </tr>
+      <tr *ngFor="
+                let data of newsletters
+                  | paginate
+                    : {
+                        itemsPerPage: NewslettersPerPage,
+                        currentPage: currentPage,
+                        totalItems: totalNewsletters
+                      };
+                let i = index
+              " class="table-hover">
+        <td class="t-checkbox">
+          <mat-checkbox class="t-mat-checkbox" [(ngModel)]="data.select"
+            (ngModelChange)="onCheckChange($event, i, data._id)"></mat-checkbox>
+        </td>
+        <!--            <td>{{ i + 1 }}</td>-->
+
+
+        <td>
+          <p
+            style="max-width: 400px;margin-inline: auto;display: -webkit-box;-webkit-line-clamp: 3;-webkit-box-orient: vertical; line-height:15px; text-wrap: wrap; overflow:hidden;text-overflow: ellipsis;">
+            {{ data.email || "-" }}</p>
+        </td>
+        <td>{{ data.number || "-" }}</td>
+
+        <td>{{ data.createdAt | date }}</td>
+
+        <td class="button">
+          <button *ngIf="checkEditPermission" mat-mini-fab color="accent"
+            [routerLink]="['../edit-newsletter/', data._id]">
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <!-- <a (click)="deleteBrandById(data._id)">
+              <img
+                src="../../../images/svg/delete.svg"
+                style="width: 25px"
+                alt="img"
+              />
+            </a> -->
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="pagination-container">
+    <pagination-controls class="data-pagination" [autoHide]="true" [maxSize]="15" (pageChange)="onPageChanged($event)">
+    </pagination-controls>
+  </div>
+  <!-- END PAGINATION -->
+
+</section>
+
+<!-- TEMPLATE NGX SPINNER-->
+<ngx-spinner bdColor="rgba(0,0,0,0.3)" size="medium" color="#fff" type="ball-scale-pulse" [fullScreen]="true">
+  <p style="color: white"> Loading... </p>
+</ngx-spinner>

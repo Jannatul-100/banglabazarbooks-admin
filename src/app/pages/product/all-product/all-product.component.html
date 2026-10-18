@@ -1,0 +1,474 @@
+<section class="admin-data-sec">
+  <div class="top-data-header">
+    <div class="title">
+      <h2>All Products</h2>
+    </div>
+
+    <form class="table-search" #searchForm=ngForm>
+      <input type="text"
+             #searchInput
+             name="searchTerm"
+             autocomplete="off"
+             ngModel placeholder="Search">
+      <button><i class="fa fa-search"></i></button>
+    </form>
+
+    <div class="action">
+
+      <button *ngIf="checkAddPermission" mat-raised-button color="accent" [routerLink]="['../', 'add-product']">
+        <mat-icon>add</mat-icon>
+        Add Product
+      </button>
+
+      <button *ngIf="checkAddPermission && !isPublisher" mat-stroked-button color="primary" [routerLink]="['../', 'bulk-upload']">
+        <mat-icon>upload_file</mat-icon>
+        Bulk Upload
+      </button>
+    </div>
+
+  </div> <!-- END TOP DATA HEADER -->
+
+  <!-- APPROVAL FILTER TABS -->
+  <div class="approval-tabs-container">
+    <div class="approval-tabs">
+      <button type="button" class="tab-item" [class.active]="activeApprovalTab === 'all'" (click)="onFilterApproval('all')">
+        <mat-icon>auto_stories</mat-icon>
+        <span>All Books</span>
+      </button>
+      <button type="button" class="tab-item pending-all" [class.active]="activeApprovalTab === 'all_pending'" (click)="onFilterApproval('all_pending')">
+        <mat-icon>pending_actions</mat-icon>
+        <span>All Pending</span>
+      </button>
+      <button type="button" class="tab-item pending-book" [class.active]="activeApprovalTab === 'pending_books'" (click)="onFilterApproval('pending_books')">
+        <mat-icon>new_releases</mat-icon>
+        <span>New Books Pending</span>
+      </button>
+      <button type="button" class="tab-item pending-price" [class.active]="activeApprovalTab === 'pending_prices'" (click)="onFilterApproval('pending_prices')">
+        <mat-icon>price_change</mat-icon>
+        <span>Price Updates Pending</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="action-multiple" style="position: relative; z-index: 20;">
+
+    <div class="date-filter">
+      <mat-form-field class="mat-date-input-field" appearance="outline" (click)="picker.open()">
+        <mat-label>FilterData Date Range</mat-label>
+        <mat-date-range-input [formGroup]="dataFormDateRange" [rangePicker]="picker" [max]="today">
+          <input matStartDate formControlName="start" placeholder="Start date" readonly>
+          <input matEndDate formControlName="end" placeholder="End date" readonly
+                 (dateChange)="endChangeRegDateRange($event)">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+
+        <mat-error *ngIf="dataFormDateRange.controls.start.hasError('matStartDateInvalid')">Invalid start date
+        </mat-error>
+        <mat-error *ngIf="dataFormDateRange.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="sort">
+      <button mat-raised-button color="primary" [matMenuTriggerFor]="menuCat">
+        {{ selectedCategoryName ? selectedCategoryName : (categories[activeFilter1]?.name ? categories[activeFilter1]?.name : 'Category') }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menuCat="matMenu">
+        <button mat-menu-item (click)="clearCategoryFilter()" [class.dropdown-active]="!selectedCategoryId">
+          All Categories
+        </button>
+        <button *ngFor="let data of categories; let i = index" mat-menu-item
+                (click)="filterData(data._id, data, 'category')"
+                [class.dropdown-active]="selectedCategoryId === data._id">
+          {{data.name}}
+        </button>
+      </mat-menu>
+    </div>
+
+    <div class="sort">
+      <button mat-raised-button color="primary" [matMenuTriggerFor]="menuAuthor">
+        {{ selectedAuthorName ? selectedAuthorName : 'Author' }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menuAuthor="matMenu" class="author-filter-menu">
+        <div class="author-search-box" (click)="$event.stopPropagation()">
+          <input
+            type="text"
+            placeholder="Search author..."
+            [(ngModel)]="authorSearchTerm"
+            (input)="onAuthorSearchChange($event)"
+            (click)="$event.stopPropagation()"
+            (keydown)="$event.stopPropagation()"
+          />
+        </div>
+        <div class="author-menu-list">
+          <button mat-menu-item (click)="clearAuthorFilter()" [class.dropdown-active]="!selectedAuthorId">
+            All Authors
+          </button>
+          <button *ngFor="let data of filteredAuthors | slice: 0: 100" mat-menu-item
+                  (click)="filterData(data._id, data, 'author')"
+                  [class.dropdown-active]="selectedAuthorId === data._id">
+            {{data.name}}
+          </button>
+          <div *ngIf="filteredAuthors && filteredAuthors.length === 0" class="no-author-msg">
+            No author found
+          </div>
+          <div *ngIf="filteredAuthors && filteredAuthors.length > 100" class="author-more-msg">
+            Showing first 100 authors. Type to search more...
+          </div>
+        </div>
+      </mat-menu>
+    </div>
+
+    <div class="sort">
+      <button  mat-raised-button color="primary"
+               (click)="filterData(10, 1, 'quantity')"
+               >
+        Low Stock
+      </button>
+    </div>
+
+    <div class="sort" *ngIf="!isPublisher">
+      <button mat-raised-button color="primary" [matMenuTriggerFor]="menuBrand">
+        {{ selectedPublisherName ? selectedPublisherName : (publishers[activeFilter3]?.name ? publishers[activeFilter3]?.name : 'Publishers') }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menuBrand="matMenu" class="author-filter-menu">
+        <div class="author-search-box" (click)="$event.stopPropagation()">
+          <input
+            type="text"
+            placeholder="Search publisher..."
+            [(ngModel)]="publisherSearchTerm"
+            (input)="onPublisherSearchChange($event)"
+            (click)="$event.stopPropagation()"
+            (keydown)="$event.stopPropagation()"
+          />
+        </div>
+        <div class="author-menu-list">
+          <button mat-menu-item (click)="clearPublisherFilter()" [class.dropdown-active]="!selectedPublisherId">
+            All Publishers
+          </button>
+          <button *ngFor="let data of filteredPublishers; let i = index" mat-menu-item
+                  (click)="filterData(data._id, data, 'publishers')"
+                  [class.dropdown-active]="selectedPublisherId === data._id">
+            {{data.name}}
+          </button>
+          <div *ngIf="filteredPublishers && filteredPublishers.length === 0" class="no-author-msg">
+            No publisher found
+          </div>
+        </div>
+      </mat-menu>
+    </div>
+
+    <div class="sort">
+      <button mat-raised-button color="primary" [matMenuTriggerFor]="menuSort">
+        Sort By
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menuSort="matMenu">
+        <button mat-menu-item (click)="sortData({updatedAt: -1}, 1)" [class.dropdown-active]="activeSort === 1">
+          Last Update
+        </button>
+        <button (click)="sortData({salePrice: 1}, 3)" mat-menu-item [class.dropdown-active]="activeSort === 3">
+          Sale Price (Low ~ High)
+        </button>
+        <button (click)="sortData({salePrice: -1}, 4)" mat-menu-item [class.dropdown-active]="activeSort === 4">
+          Sale Price (High ~ Low)
+        </button>
+        <button (click)="sortData({quantity: 1}, 5)" mat-menu-item [class.dropdown-active]="activeSort === 5">
+          Quantity (Low ~ High)
+        </button>
+        <button (click)="sortData({quantity: -1}, 6)" mat-menu-item [class.dropdown-active]="activeSort === 6">
+          Quantity (High ~ Low)
+        </button>
+      </mat-menu>
+    </div>
+
+    <div class="sort" *ngIf="!isPublisher">
+      <button
+        *ngIf="checkEditPermission"
+        mat-stroked-button
+        color="accent"
+        (click)="fixPreviewImageUrls()"
+        matTooltip="Replace localhost preview links with ftp.banglabazarbooks.com in database"
+      >
+        Fix Preview URLs
+        <mat-icon>link</mat-icon>
+      </button>
+    </div>
+
+    <div class="sort" *ngIf="!isPublisher">
+      <button
+        *ngIf="checkEditPermission"
+        mat-stroked-button
+        color="warn"
+        (click)="regenerateAllBookPreviews()"
+        matTooltip="Delete all old preview files and URLs, then create fresh previews for every book"
+      >
+        Regenerate All Previews
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+
+    <div class="sort" *ngIf="!isPublisher">
+      <button
+        *ngIf="checkEditPermission"
+        mat-stroked-button
+        color="accent"
+        (click)="generateAllBookPreviews()"
+        matTooltip="Generate preview images only for books that are missing valid preview files"
+      >
+        Generate Book Previews
+        <mat-icon>auto_stories</mat-icon>
+      </button>
+    </div>
+
+    <div class="sort">
+      <button mat-raised-button color="accent" (click)="exportToAllExcel()">
+        Export as Excel
+        <mat-icon>file_download</mat-icon>
+      </button>
+    </div>
+
+    <div class="sort">
+      <button mat-raised-button color="primary" [matMenuTriggerFor]="menuShow">
+        {{selectedPagination ? selectedPagination : 'Show Product'}}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menuShow="matMenu">
+        <button mat-menu-item (click)="SelectChange(10)" [class.dropdown-active]="selectedPagination === 10">10</button>
+        <button mat-menu-item (click)="SelectChange(20)" [class.dropdown-active]="selectedPagination === 20">20</button>
+        <button mat-menu-item (click)="SelectChange(30)" [class.dropdown-active]="selectedPagination === 30">30</button>
+        <button mat-menu-item (click)="SelectChange(40)" [class.dropdown-active]="selectedPagination === 40">40</button>
+        <button mat-menu-item (click)="SelectChange(50)" [class.dropdown-active]="selectedPagination === 50">50</button>
+        <button mat-menu-item (click)="SelectChange(60)" [class.dropdown-active]="selectedPagination === 60">60</button>
+        <button mat-menu-item (click)="SelectChange(70)" [class.dropdown-active]="selectedPagination === 70">70</button>
+        <button mat-menu-item (click)="SelectChange(80)" [class.dropdown-active]="selectedPagination === 80">80</button>
+        <button mat-menu-item (click)="SelectChange(100)" [class.dropdown-active]="selectedPagination === 100">100</button>
+      </mat-menu>
+    </div>
+
+  </div>
+
+  <hr class="center-square">
+
+  <div class="table-wrapper space">
+
+    <div class="table-action" [class.dual]="hasActiveFilter">
+      <div class="left" *ngIf="hasActiveFilter">
+        <button mat-stroked-button color="accent" (click)="onRemoveAllQuery()">
+          <mat-icon>close</mat-icon>
+          Clear FilterData
+        </button>
+      </div>
+
+      <div class="right" *ngIf="selectedIds && selectedIds.length">
+        <button *ngIf="!isPublisher && checkEditPermission" mat-stroked-button color="primary" (click)="openBulkApplyTagDialog()">
+          Apply Tags
+        </button>
+
+        <button *ngIf="!isPublisher && checkEditPermission" mat-stroked-button color="primary" [matMenuTriggerFor]="menu">
+          Change Status
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="openConfirmDialog('edit', {status: 'publish'})">Publish</button>
+          <button mat-menu-item (click)="openConfirmDialog('edit', {status: 'draft'})">Draft</button>
+        </mat-menu>
+
+        <button *ngIf="!isPublisher && checkDeletePermission" mat-stroked-button color="warn" (click)="openConfirmDialog('delete')"
+                matTooltip="Delete">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div> <!-- END Table Action -->
+
+    <table>
+      <tr>
+        <th class="t-checkbox">
+          <mat-checkbox #matCheckbox (change)="onAllSelectChange($event)"></mat-checkbox>
+        </th>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Sub Category</th>
+        <th>Publisher</th>
+        <th>Author</th>
+        <th>Available quantity</th>
+        <th>Sale Price</th>
+        <th>Discount</th>
+        <th>Status</th>
+        <th style="text-align: center;">FB Catalog</th>
+        <th>Actions</th>
+      </tr>
+      <tr
+        *ngFor="let data of products | paginate: { itemsPerPage: ProductsPerPage, currentPage: currentPage, totalItems: totalProducts } ; let i = index">
+        <td class="t-checkbox">
+          <mat-checkbox class="t-mat-checkbox" [(ngModel)]="data.select"
+                        (ngModelChange)="onCheckChange($event, i, data._id)"></mat-checkbox>
+        </td>
+        <td>
+          <img checkImageDefault class="table-image" [src]="data && data?.images ? data.images[0] : ''" [alt]="data.name">
+        </td>
+        <td>{{data.name}}</td>
+        <td>{{data.category?.name}}</td>
+        <td>{{data.subCategory ? data.subCategory?.name : 'N/A'}}</td>
+        <td>{{data.publisher?.name}}</td>
+        <td>{{getAuthorNames(data.author)}}</td>
+        <td>{{data?.quantity}}</td>
+        <td>
+          <div>৳{{data.salePrice | number : '': 'bn'}}</div>
+          <div *ngIf="data.pendingPriceUpdate?.status === 'pending'" class="proposed-price-badge" matTooltip="New proposed price pending admin approval">
+            <span class="label">Pending:</span> ৳{{data.pendingPriceUpdate?.salePrice | number : '': 'bn'}}
+          </div>
+        </td>
+        <td>
+          <span *ngIf="data.discountType === 1">{{data.discountAmount | number : '': 'bn'}}%</span>
+          <span *ngIf="data.discountType === 2">৳{{data.discountAmount | number : '': 'bn'}}</span>
+          <span *ngIf="!data.discountType || data.discountType === 0">-</span>
+        </td>
+        <td>
+          <span class="status-pill" [class.published]="data.status === 'publish'" [class.draft]="data.status !== 'publish'">
+            {{data.status | titlecase}}
+          </span>
+          <div *ngIf="data.approvalStatus === 'pending'" class="approval-pill pending-book-pill">
+            <mat-icon>hourglass_top</mat-icon> Book Pending
+          </div>
+          <div *ngIf="data.pendingPriceUpdate?.status === 'pending'" class="approval-pill pending-price-pill">
+            <mat-icon>price_change</mat-icon> Price Pending
+          </div>
+        </td>
+        <td style="text-align: center;">
+          <mat-slide-toggle
+            [checked]="data.isFacebookCatalog"
+            (change)="onToggleFbCatalog(data, $event)"
+            color="primary"
+            matTooltip="Add or remove book from Facebook Catalog">
+          </mat-slide-toggle>
+        </td>
+        <td class="td-action">
+          <button [disabled]="data._id === adminId || !checkEditPermission"
+                  [routerLink]="['../', 'edit-product', data._id]" target="_blank" mat-mini-fab matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button *ngIf="!isPublisher" style="margin-left: 5px;" mat-mini-fab matTooltip="Clone" color="primary" (click)="openConfirmDialog('clone', data._id)">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+
+          <!-- SUPER ADMIN APPROVAL ACTIONS -->
+          <ng-container *ngIf="isSuperAdmin">
+            <!-- Book Approval Buttons -->
+            <button *ngIf="data.approvalStatus === 'pending'"
+                    style="margin-left: 5px;"
+                    mat-mini-fab
+                    color="primary"
+                    matTooltip="Approve Book & Publish"
+                    (click)="onApproveProduct(data._id)">
+              <mat-icon>check</mat-icon>
+            </button>
+
+            <button *ngIf="data.approvalStatus === 'pending'"
+                    style="margin-left: 5px;"
+                    mat-mini-fab
+                    color="warn"
+                    matTooltip="Reject Book"
+                    (click)="onRejectProduct(data._id)">
+              <mat-icon>close</mat-icon>
+            </button>
+
+            <!-- Price Approval Buttons -->
+            <button *ngIf="data.pendingPriceUpdate?.status === 'pending'"
+                    style="margin-left: 5px; background-color: #10b981; color: white;"
+                    mat-mini-fab
+                    [matTooltip]="'Approve Price: ৳' + data.pendingPriceUpdate?.salePrice"
+                    (click)="onApprovePrice(data._id)">
+              <mat-icon>price_check</mat-icon>
+            </button>
+
+            <button *ngIf="data.pendingPriceUpdate?.status === 'pending'"
+                    style="margin-left: 5px;"
+                    mat-mini-fab
+                    color="warn"
+                    matTooltip="Reject Price Update"
+                    (click)="onRejectPrice(data._id)">
+              <mat-icon>money_off</mat-icon>
+            </button>
+          </ng-container>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="pagination-container" style="position: relative; z-index: 10; padding-top: 10px; margin-bottom: 20px;">
+    <pagination-controls
+      class="data-pagination"
+      [autoHide]="false"
+      [maxSize]="5"
+      (pageChange)="onPageChanged($event)">
+    </pagination-controls>
+  </div>     <!-- END PAGINATION -->
+
+  <div class="bottom-bulk-bar" [class.active]="selectedIds.length > 0">
+    <div class="bar-content">
+      <div class="selection-info">
+        <span class="count">{{ selectedIds.length }}</span>
+        <span class="text">Products selected</span>
+      </div>
+
+      <div class="bar-actions">
+        <button mat-button class="btn-clear" (click)="clearSelection()">
+          <mat-icon>close</mat-icon>
+          Clear Selection
+        </button>
+
+        <button *ngIf="checkEditPermission" mat-raised-button color="primary" (click)="openBulkApplyTagDialog()">
+          <mat-icon>label</mat-icon>
+          Apply Tags
+        </button>
+
+        <button *ngIf="checkEditPermission" mat-raised-button color="primary" [matMenuTriggerFor]="bulkStatusMenu">
+          Change Status
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #bulkStatusMenu="matMenu">
+          <button mat-menu-item (click)="openConfirmDialog('edit', {status: 'publish'})">Publish</button>
+          <button mat-menu-item (click)="openConfirmDialog('edit', {status: 'draft'})">Draft</button>
+        </mat-menu>
+
+        <button *ngIf="checkEditPermission" mat-raised-button color="accent" [matMenuTriggerFor]="bulkFbMenu">
+          <mat-icon>dynamic_feed</mat-icon>
+          FB Catalog
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #bulkFbMenu="matMenu">
+          <button mat-menu-item (click)="openConfirmDialog('fbCatalog', {isFacebookCatalog: true})">
+            <mat-icon color="primary">add_circle</mat-icon>
+            Add Selected to FB Catalog
+          </button>
+          <button mat-menu-item (click)="openConfirmDialog('fbCatalog', {isFacebookCatalog: false})">
+            <mat-icon color="warn">remove_circle</mat-icon>
+            Remove Selected from FB Catalog
+          </button>
+        </mat-menu>
+
+        <button mat-raised-button color="primary" (click)="exportToAllExcel()">
+          <mat-icon>file_download</mat-icon>
+          Export Excel
+        </button>
+
+        <button *ngIf="checkDeletePermission" mat-raised-button color="warn" (click)="openConfirmDialog('delete')">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- LOADING TEMPLATE -->
+  <ngx-spinner bdColor="rgba(0, 0, 0, 0.5)" size="medium" color="#fff" type="ball-atom" [fullScreen]="false">
+    <p style="color: white"> Loading... </p>
+  </ngx-spinner>
+
+</section>

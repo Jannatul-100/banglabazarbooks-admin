@@ -1,0 +1,428 @@
+<div class="section1" *ngIf="USER_ROLE === 'super_admin'">
+  <div class="section1-main">
+    <!---card-->
+    <div class="card" routerLink="sales/sales-list" [routerLink]="['/sales/all-orders']">
+      <div class="card-top">
+        <div class="card-top-left">
+          <h3>Total Orders</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon class="material-symbols-outlined">
+              point_of_sale
+            </mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Total Orders">
+          <h3>
+            {{
+            saleDashboard?.totalOrders
+            ? (saleDashboard?.totalOrders | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Today Sale">
+            <mat-icon>show_chart</mat-icon>
+
+          </h5>
+        </div> -->
+      </div>
+    </div>
+    <!---card-->
+    <div class="card" [routerLink]="['../sales/sales-list']">
+      <div class="card-top">
+        <div class="card-top-left">
+          <h3>Pending Orders</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon>task</mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Pending Orders">
+          <h3>
+            {{
+            saleDashboard?.totalPendingOrders
+            ? (saleDashboard?.totalPendingOrders | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Total Invoice">
+            <mat-icon>show_chart</mat-icon>
+
+          </h5>
+        </div> -->
+      </div>
+    </div>
+    <!---card-->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-top-left">
+          <h3>Today Orders</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon>leaderboard</mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Today Orders">
+          <h3>
+            {{
+            saleDashboard?.countTodayAddedOrder
+            ? (saleDashboard?.countTodayAddedOrder | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Work direction done percentage today">
+            <mat-icon>show_chart</mat-icon>
+          </h5>
+        </div> -->
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="card-top-left">
+          <h3>Today Orders Amount</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon class="material-symbols-outlined">
+              attach_money
+            </mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Total Orders">
+          <h3>
+            {{
+            saleDashboard?.todayOrderAmount
+            ? (saleDashboard?.todayOrderAmount | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Today Sale">
+            <mat-icon>show_chart</mat-icon>
+
+          </h5>
+        </div> -->
+      </div>
+    </div>
+    <!---card-->
+    <div class="card" *ngIf="USER_ROLE === 'super_admin'">
+      <div class="card-top">
+        <div class="card-top-left">
+          <h3>Weekly Orders</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon class="material-symbols-outlined">
+              point_of_sale
+            </mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Total Orders">
+          <h3>
+            {{
+            saleDashboard?.weeklyOrderCount
+            ? (saleDashboard?.weeklyOrderCount | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Today Sale">
+            <mat-icon>show_chart</mat-icon>
+
+          </h5>
+        </div> -->
+      </div>
+    </div>
+    <!---card-->
+    <div class="card" *ngIf="USER_ROLE === 'super_admin'">
+      <div class="card-top">
+        <div class="card-top-left">
+          <h3>Weekly Orders Amount</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon class="material-symbols-outlined">
+              attach_money
+            </mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Total Orders">
+          <h3>
+            {{
+            saleDashboard?.weeklyOrderAmount
+            ? (saleDashboard?.weeklyOrderAmount | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Today Sale">
+            <mat-icon>show_chart</mat-icon>
+
+          </h5>
+        </div> -->
+      </div>
+    </div>
+    <!---card-->
+    <div class="card" *ngIf="USER_ROLE === 'super_admin'">
+      <div class="card-top" style="background-color: #06ACB6">
+        <div class="card-top-left">
+          <h3>Monthly Delivered Orders</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon class="material-symbols-outlined">flowsheet</mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Monthly Delivered Orders">
+          <h3 style="color: green">
+            {{
+            saleDashboard?.monthlyDeliveredOrders > 0
+            ? (saleDashboard?.monthlyDeliveredOrders | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Total Loss">
+            <mat-icon style="color: #ef0000b8">show_chart</mat-icon>
+
+          </h5>
+        </div> -->
+      </div>
+    </div>
+    <!---card-->
+    <div class="card" *ngIf="USER_ROLE === 'super_admin'">
+      <div class="card-top">
+        <div class="card-top-left">
+          <h3>Monthly Orders Amount</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon class="material-symbols-outlined">
+              attach_money
+            </mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Total Orders">
+          <h3>
+            {{
+            saleDashboard?.monthlyOrderAmount
+            ? (saleDashboard?.monthlyOrderAmount | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Today Sale">
+            <mat-icon>show_chart</mat-icon>
+
+          </h5>
+        </div> -->
+      </div>
+    </div>
+
+    <div [routerLink]="['/user/user-list']" class="card" *ngIf="USER_ROLE === 'super_admin'">
+      <div class="card-top">
+        <div class="card-top-left">
+          <h3>Total Customer</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon class="material-symbols-outlined">
+              group_add
+            </mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Total Orders">
+          <h3>
+            {{
+            saleDashboard?.totalCustomerCount
+            ? (saleDashboard?.totalCustomerCount | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Today Sale">
+            <mat-icon>show_chart</mat-icon>
+
+          </h5>
+        </div> -->
+      </div>
+    </div>
+    <!---card-->
+    <div class="card" [routerLink]="['/product/all-product']" *ngIf="USER_ROLE === 'super_admin'">
+      <div class="card-top" style="background-color: #4695DE">
+        <div class="card-top-left">
+          <h3>Total Products</h3>
+        </div>
+        <!-- <div class="card-top-right">
+          <div class="card-icon">
+            <mat-icon class="material-symbols-outlined"> inventory_2 </mat-icon>
+          </div>
+        </div> -->
+      </div>
+      <div class="card-body">
+        <div class="card-number" matTooltip="Total Products">
+          <h3 style="color: rgb(47 94 179)">
+            {{
+            saleDashboard?.totalProducts
+            ? (saleDashboard?.totalProducts | number : "" : "bn")
+            : 0
+            }}
+          </h3>
+        </div>
+        <!-- <div class="card-activity">
+          <h5 matTooltip="Today Expense">
+            <mat-icon style="color: rgb(47 94 179)">show_chart</mat-icon>
+
+          </h5>
+        </div> -->
+      </div>
+    </div>
+  </div>
+  <div class="section2-main">
+    <!---card-->
+
+
+  </div>
+</div>
+
+
+<div class="order-card-section">
+  <div class="order-card-area">
+    <div class="order-card-header" style="background: #137ae4ed">
+      <h3>Todays Status</h3>
+    </div>
+    <div class="order-card-body">
+      <div class="order-card-left">
+        <p>Order : {{
+          saleDashboard?.countTodayAddedOrder
+          ? (saleDashboard?.countTodayAddedOrder | number : "" : "bn")
+          : 0
+          }}</p>
+        <!--        <p>Sold Item : 15</p>-->
+        <p>Shipped : {{
+          saleDashboard?.todayTotalShippingOrders
+          ? (saleDashboard?.todayTotalShippingOrders | number : "" : "bn")
+          : 0
+          }}</p>
+        <p>Sales : {{
+          saleDashboard?.todayOrderAmount
+          ? (saleDashboard?.todayOrderAmount | number : "" : "bn")
+          : 0
+          }} TK</p>
+      </div>
+      <div class="order-card-right">
+        <p>Paid : {{saleDashboard?.todayPaidOrderAmount
+          ? (saleDashboard?.todayPaidOrderAmount | number : "" : "bn")
+          : 0}} TK</p>
+        <p>Unpaid : {{saleDashboard?.todayUnpaidOrderAmount
+          ? (saleDashboard?.todayUnpaidOrderAmount | number : "" : "bn")
+          : 0}} TK</p>
+        <p>Due Collection : {{saleDashboard?.todayDelvedOrderAmount
+          ? (saleDashboard?.todayDelvedOrderAmount | number : "" : "bn")
+          : 0}} TK</p>
+        <!--        <p>gross Profit : 526 TK</p>-->
+      </div>
+    </div>
+  </div>
+
+  <div class="order-card-area">
+    <div class="order-card-header" style="background: rgb(250 120 0);">
+      <h3>This Month’s Status</h3>
+    </div>
+    <div class="order-card-body">
+      <div class="order-card-left">
+        <p>Order : {{
+          saleDashboard?.monthlyOrderCount > 0
+          ? (saleDashboard?.monthlyOrderCount | number : "" : "bn")
+          : 0
+          }}</p>
+        <!--        <p>Sold Item : 15</p>-->
+        <p>Delivered : {{
+          saleDashboard?.monthlyDeliveredOrders > 0
+          ? (saleDashboard?.monthlyDeliveredOrders | number : "" : "bn")
+          : 0
+          }}</p>
+        <p>Sales : {{
+          saleDashboard?.monthlyOrderAmount > 0
+          ? (saleDashboard?.monthlyOrderAmount | number : "" : "bn")
+          : 0
+          }} TK</p>
+      </div>
+      <div class="order-card-right">
+        <p>Paid : {{
+          saleDashboard?.monthlyPaidOrderAmount > 0
+          ? (saleDashboard?.monthlyPaidOrderAmount | number : "" : "bn")
+          : 0
+          }} TK</p>
+        <p>Unpaid : {{
+          saleDashboard?.monthlyUnpaidOrderAmount > 0
+          ? (saleDashboard?.monthlyUnpaidOrderAmount | number : "" : "bn")
+          : 0
+          }} TK</p>
+        <p>Due Collection : {{
+          saleDashboard?.monthlyDeliveredOrderAmount > 0
+          ? (saleDashboard?.monthlyDeliveredOrderAmount | number : "" : "bn")
+          : 0
+          }} TK</p>
+        <!--        <p>gross Profit : 526 TK</p>-->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="donut">
+  <app-users></app-users>
+  <app-donut></app-donut>
+  <div class="stock-data" routerLink="/product/low-stock">
+    <div class="stock">
+      <img src="/images/logo/g.svg" alt="">
+    </div>
+    <div class="text-area">
+      <span>Low Stock</span>
+      <p>{{
+        saleDashboard?.totalLowStockProducts > 0
+        ? (saleDashboard?.totalLowStockProducts | number : "" : "bn")
+        : 0
+        }}</p>
+    </div>
+  </div>
+</div>
+
+
+<app-bar-chat></app-bar-chat>

@@ -1,0 +1,47 @@
+<section class="admin-data-sec">
+  <div class="top-data-header">
+    <div class="title">
+      <h2>bKash Refund</h2>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <form [formGroup]="refundForm" (ngSubmit)="onSubmit()">
+      <mat-card>
+        <mat-card-content>
+          <div fxLayout="column" fxLayoutGap="16px">
+            <mat-form-field appearance="outline">
+              <mat-label>Payment ID</mat-label>
+              <input matInput formControlName="paymentID" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Transaction ID (TrxID)</mat-label>
+              <input matInput formControlName="trxID" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Amount</mat-label>
+              <input matInput formControlName="amount" type="number" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>SKU</mat-label>
+              <input matInput formControlName="sku" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Reason</mat-label>
+              <input matInput formControlName="reason" required>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-raised-button color="primary" type="submit" [disabled]="isLoading">
+            {{ isLoading ? 'Processing...' : 'Refund' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </form>
+  </div>
+</section>

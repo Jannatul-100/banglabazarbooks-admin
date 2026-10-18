@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>Apply Tags</h2>
+
+<mat-dialog-content>
+  <p class="hint">{{ data.count }} product(s) selected</p>
+
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Select Tags</mat-label>
+    <mat-select [(ngModel)]="selectedTagIds" multiple>
+      <mat-option *ngFor="let tag of tags" [value]="tag._id">
+        {{ tag.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!selectedTagIds.length"
+    (click)="apply()"
+  >
+    Apply Tags
+  </button>
+</mat-dialog-actions>

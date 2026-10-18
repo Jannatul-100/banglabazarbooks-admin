@@ -1,0 +1,24 @@
+@import "src/theme/exports/table-scroll";
+@import "src/theme/exports/search-table";
+@import "src/theme/exports/top-data-header";
+@import "../all-file/all-file.component";
+
+
+
+
+.close {
+  position: absolute;
+  top: 72px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  text-align: center;
+
+  button {
+    background: #ffc9c9;
+  }
+}
+
+.on-done {
+  text-align: center;
+}

@@ -1,0 +1,68 @@
+<section class="admin-data-sec">
+  <div class="top-data-header">
+    <div class="title">
+      <h2>All Landing Pages</h2>
+    </div>
+    <div class="action">
+      <button mat-raised-button color="primary" [routerLink]="['../', 'add-landing-page']">
+        <mat-icon>add</mat-icon>
+        Add Landing Page
+      </button>
+      <button mat-raised-button color="accent" [routerLink]="['../', 'add-landing-page-2']">
+        <mat-icon>add</mat-icon>
+        Add Landing Page 2
+      </button>
+    </div>
+  </div>
+  <hr class="center-square">
+
+  <div class="table-wrapper space">
+    <table>
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Slug</th>
+        <th>Template</th>
+        <th>Status</th>
+        <th>Products</th>
+        <th>Created</th>
+        <th>Action</th>
+      </tr>
+      <tr *ngFor="let page of landingPages | paginate: { itemsPerPage: landingPagesPerPage, currentPage: currentPage, totalItems: totalLandingPages }">
+        <td>
+          <img checkImageDefault class="table-image" [src]="page.heroImage" alt="">
+        </td>
+        <td>{{ page.name }}</td>
+        <td>{{ page.slug }}</td>
+        <td>{{ page.template === 'v2' ? 'Landing Page 2' : 'Landing Page 1' }}</td>
+        <td>{{ page.status }}</td>
+        <td style="font-weight: 600; color: green">{{ page.products?.length || 0 }}</td>
+        <td>{{ page.createdAt | date }}</td>
+        <td class="td-action action-btns">
+          <button mat-mini-fab color="primary" (click)="copyLink(page)" matTooltip="Copy Link">
+            <mat-icon>link</mat-icon>
+          </button>
+          <button mat-mini-fab color="accent" [routerLink]="['../', 'edit-landing-page', page._id]" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-mini-fab color="warn" (click)="deleteLandingPage(page._id)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="pagination-container">
+    <pagination-controls
+      class="data-pagination"
+      [autoHide]="true"
+      [maxSize]="15"
+      (pageChange)="onPageChanged($event)">
+    </pagination-controls>
+  </div>
+
+  <ngx-spinner bdColor="rgba(0, 0, 0, 0.5)" size="medium" color="#fff" type="ball-atom" [fullScreen]="false">
+    <p style="color: white"> Loading... </p>
+  </ngx-spinner>
+</section>

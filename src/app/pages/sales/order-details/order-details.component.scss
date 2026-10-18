@@ -1,0 +1,335 @@
+@import "src/theme/exports/table-scroll";
+@import "src/theme/exports/top-data-header";
+
+.header {
+  width: 100%;
+  margin: 10px 0;
+  padding: 0 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.stock-badge {
+  display: block;
+  // margin-bottom: 7px;
+}
+
+.stock-badge span {
+  background-color: $color-primary;
+  display: inline-block;
+  padding: 2px 5px 2px 15px;
+  box-sizing: border-box;
+  color: #fff;
+  font-family: $font-en-primary;
+  font-weight: 500;
+  font-size: 11px;
+  position: relative;
+}
+
+.stock-badge span::after {
+  content: "";
+  width: 0px;
+  height: 0px;
+  border-left: 13px solid #fff;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+
+.bottom-view {
+  display: flex;
+
+
+  .action {
+    margin: 10px;
+    border: 1px solid #ebebeb;
+    .item {
+      width: 100%;
+      border: 1px solid #ebebeb;
+      height: 50px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .left{
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        height: 100%;
+        background: #f5f5f5;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .left-Shipping{
+        padding: 5.6% 10px;
+      }
+      .right {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding: 0 10px;
+        p {
+          font-size: 15px;
+          margin-top: 15px;
+        }
+
+        p.bold {
+          font-weight: bold;
+        }
+
+        mat-form-field {
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+
+  .calculation {
+    flex: 4;
+  }
+  .info {
+    flex: 6;
+    .item {
+      height: 40px;
+    }
+    .test{
+      height: auto !important;
+    }
+  }
+}
+
+.profile {
+  width: 90%;
+  margin: 18px auto auto;
+  //height: 50px;
+  padding: 10px;
+  background: #f4f4f4;
+  border-radius: 10px;
+
+  //.img-thumb {
+  //  width: 80px;
+  //  height: 80px;
+  //  border-radius: 85px;
+  //  margin: 0 auto;
+  //  img {
+  //    width: 100%;
+  //    height: 100%;
+  //    object-fit: cover;
+  //    border-radius: 100%;
+  //  }
+  //}
+
+  .info {
+    margin-top: 5px;
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    h2 {
+      font-size: 15px;
+      color: #484848;
+      text-align: center;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+  }
+
+
+}
+
+.order-timeline {
+  padding: 10px;
+
+  .view {
+    border: 3px solid #ebebeb;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .title {
+    h2 {
+      font-size: 23px;
+      background: #eaeaea;
+      padding: 12px 21px;
+      border-radius: 6px;
+      color: #369BFF;
+    }
+  }
+}
+.note-content{
+  background-color: #0d812b;
+  color: #fff!important;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.moderator-audit-section {
+  margin-top: 30px;
+
+  .audit-content {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 10px;
+  }
+
+  .audit-timeline {
+    position: relative;
+  }
+
+  .audit-item {
+    display: flex;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 20px;
+
+    &:last-child {
+      padding-bottom: 0;
+      .audit-line {
+        display: none;
+      }
+    }
+  }
+
+  .audit-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .audit-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #3f51b5;
+      border: 3px solid #e0e7ff;
+      flex-shrink: 0;
+      margin-top: 4px;
+
+      &.badge-created { background: #16a34a; border-color: #dcfce7; }
+      &.badge-status { background: #2563eb; border-color: #dbeafe; }
+      &.badge-edited { background: #ea580c; border-color: #ffedd5; }
+      &.badge-courier { background: #9333ea; border-color: #f3e8ff; }
+    }
+
+    .audit-line {
+      width: 2px;
+      flex: 1;
+      background: #e2e8f0;
+      margin-top: 4px;
+    }
+  }
+
+  .audit-body {
+    flex: 1;
+
+    .audit-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+
+      .action-tag {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 6px;
+
+        &.badge-created { background: #dcfce7; color: #15803d; }
+        &.badge-status { background: #e0f2fe; color: #0369a1; }
+        &.badge-edited { background: #fef3c7; color: #b45309; }
+        &.badge-courier { background: #f3e8ff; color: #7e22ce; }
+        &.badge-default { background: #f1f5f9; color: #475569; }
+      }
+
+      .moderator-name {
+        font-size: 13px;
+        color: #1a202c;
+
+        .role-pill {
+          font-size: 11px;
+          color: #718096;
+          margin-left: 4px;
+          text-transform: capitalize;
+        }
+      }
+
+      .audit-time {
+        font-size: 11px;
+        color: #a0aec0;
+        margin-left: auto;
+      }
+    }
+
+    .audit-desc {
+      font-size: 12px;
+      color: #4a5568;
+      margin-top: 5px;
+    }
+
+    .audit-status-flow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+
+      .flow-arrow {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+        color: #a0aec0;
+      }
+
+      .flow-pill {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+
+        &.old { background: #f1f5f9; color: #64748b; text-decoration: line-through; }
+        &.new { background: #dbeafe; color: #1e40af; }
+      }
+    }
+  }
+
+  .no-audit {
+    padding: 12px;
+    font-size: 13px;
+    color: #4a5568;
+  }
+}
+
+
+@media (min-width:300px) and (max-width:600px){
+  .bottom-view {
+    display: inline-block;
+  }
+  .view {
+    display: flex;
+    flex-direction: column;
+  }
+  .title {
+    margin-top: 25px;
+}
+
+.mat-raised-button {
+  padding: 0 4px;
+}
+.mat-raised-button {
+  font-size: 12px;
+}
+mat-icon{
+  font-size: 18px;
+}
+}

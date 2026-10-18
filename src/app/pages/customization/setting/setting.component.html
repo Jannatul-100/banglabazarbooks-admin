@@ -1,0 +1,348 @@
+<section class="admin-data-sec">
+  <div class="top-data-header">
+    <div class="title">
+      <h2>Global Settings Configuration</h2>
+    </div>
+  </div>
+
+  <div class="settings-layout" *ngIf="dataForm">
+    <!-- Sidebar -->
+    <div class="settings-sidebar">
+      <div class="sidebar-item" [class.active]="selectedSection === 'gtm'" (click)="selectedSection = 'gtm'">
+        <mat-icon>analytics</mat-icon>
+        <span>Facebook & GTM</span>
+      </div>
+      <div class="sidebar-item" [class.active]="selectedSection === 'tiktok'" (click)="selectedSection = 'tiktok'">
+        <mat-icon>video_library</mat-icon>
+        <span>TikTok Pixel</span>
+      </div>
+      <div class="sidebar-item" [class.active]="selectedSection === 'fraud'" (click)="selectedSection = 'fraud'">
+        <mat-icon>security</mat-icon>
+        <span>Fraud Checker</span>
+      </div>
+      <div class="sidebar-item" [class.active]="selectedSection === 'courier'" (click)="selectedSection = 'courier'">
+        <mat-icon>local_shipping</mat-icon>
+        <span>Courier API</span>
+      </div>
+      <div class="sidebar-item" [class.active]="selectedSection === 'fbCatalog'" (click)="selectedSection = 'fbCatalog'">
+        <mat-icon>dynamic_feed</mat-icon>
+        <span>Facebook Catalog</span>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="settings-content">
+      <form [formGroup]="dataForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Analytics & GTM Section -->
+        <div class="section-wrapper" *ngIf="selectedSection === 'gtm'" formGroupName="analytics">
+          <div class="section-header">
+            <h3>Facebook & Google Tag Manager</h3>
+            <p>Configure your tracking IDs and pixel access tokens</p>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-field-wrapper w-100">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Google Tag Manager ID</mat-label>
+                <input matInput formControlName="tagManagerId" placeholder="GTM-XXXXXXX">
+              </mat-form-field>
+            </div>
+            
+            <div class="form-field-wrapper">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Facebook Pixel ID</mat-label>
+                <input matInput formControlName="facebookPixelId" placeholder="Enter Pixel ID">
+              </mat-form-field>
+            </div>
+            
+            <div class="form-field-wrapper">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Facebook Pixel Access Token</mat-label>
+                <input matInput formControlName="facebookPixelAccessToken" placeholder="Enter Access Token">
+              </mat-form-field>
+            </div>
+
+            <div class="form-field-wrapper">
+              <mat-checkbox formControlName="IsManageFbPixelByTagManager" color="primary">
+                Manage FB Pixel via GTM
+              </mat-checkbox>
+            </div>
+
+            <div class="form-field-wrapper">
+              <mat-checkbox formControlName="isEnablePixelTestEvent" color="primary">
+                Enable Test Events
+              </mat-checkbox>
+            </div>
+
+            <div class="form-field-wrapper" *ngIf="dataForm.get('analytics.isEnablePixelTestEvent')?.value">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Test Event Code</mat-label>
+                <input matInput formControlName="facebookPixelTestEventId" placeholder="TESTXXXXX">
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <!-- TikTok Section -->
+        <div class="section-wrapper" *ngIf="selectedSection === 'tiktok'" formGroupName="analytics">
+          <div class="section-header">
+            <h3>TikTok Pixel Integration</h3>
+            <p>Manage your TikTok advertising tracking and events</p>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-field-wrapper">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>TikTok Pixel ID</mat-label>
+                <input matInput formControlName="tiktokPixelId" placeholder="Enter TikTok Pixel ID">
+              </mat-form-field>
+            </div>
+            
+            <div class="form-field-wrapper">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>TikTok Access Token</mat-label>
+                <input matInput formControlName="tiktokAccessToken" placeholder="Enter TikTok Access Token">
+              </mat-form-field>
+            </div>
+
+            <div class="form-field-wrapper">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Test Event Code</mat-label>
+                <input matInput formControlName="tiktokTestEventCode" placeholder="Enter Test Code">
+              </mat-form-field>
+            </div>
+
+            <div class="form-field-wrapper">
+              <mat-checkbox formControlName="isPurchaseEventOnConfirm" color="primary">
+                Fire Purchase Event on Order Confirm
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fraud Check Section -->
+        <div class="section-wrapper" *ngIf="selectedSection === 'fraud'" formGroupName="fraudCheck">
+          <div class="section-header">
+            <h3>Fraud Detection Configuration</h3>
+            <p>Configure your fraud check API settings to prevent malicious orders</p>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-field-wrapper w-100">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>API Key</mat-label>
+                <input matInput formControlName="apiKey" placeholder="Enter Fraud Check API Key">
+              </mat-form-field>
+            </div>
+            
+            <div class="form-field-wrapper w-100">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>API Type</mat-label>
+                <mat-select formControlName="apiType">
+                  <mat-option value="free">Free</mat-option>
+                  <mat-option value="pro">Pro</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <!-- Courier Section (Legacy Style) -->
+        <div class="section-wrapper" *ngIf="selectedSection === 'courier'">
+          <div class="section-header">
+            <h3>Courier API Configuration</h3>
+            <p>Manage your courier providers and select the active one for dispatching</p>
+          </div>
+
+          <div class="legacy-courier-container">
+            <!-- Methods List -->
+            <div class="courier-methods-list">
+              <div class="courier-method-item" *ngFor="let item of courierMethods; let i = index" 
+                   [class.active-item]="selectedIndex === i" (click)="onSelectCourier(i)">
+                <div class="icon-checkbox" (click)="toggleCourierStatus(i, $event)" 
+                     [class.active]="item.status === 'active'">
+                  <mat-icon>{{ item.status === 'active' ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                </div>
+                <div class="info">
+                  <h5>{{ item.providerName }}</h5>
+                  <span class="manage-text">Click to manage settings</span>
+                </div>
+                <div class="active-badge" *ngIf="item.status === 'active'">Active</div>
+              </div>
+
+              <!-- Add New Button -->
+              <div class="add-courier-item" *ngIf="courierMethods.length < courierProviders.length" (click)="onAddNewCourier()">
+                <div class="icon"><mat-icon>add</mat-icon></div>
+                <div class="info"><h5>Add New Courier Method</h5></div>
+              </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="courier-form-container" *ngIf="formViewMode">
+              <div class="form-header">
+                <h4>{{ formViewMode === 'add' ? 'Add' : 'Edit' }} Courier Settings</h4>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-field-wrapper w-100">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Select Provider</mat-label>
+                    <mat-select formControlName="providerName">
+                      <mat-option *ngFor="let item of courierProviders" [value]="item.value" [disabled]="isDisabledOpt(item.value) && formViewMode === 'add'">
+                        {{ item.viewValue }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <!-- Steadfast Fields -->
+                <ng-container *ngIf="dataForm.get('providerName')?.value?.includes('Steadfast')">
+                  <div class="form-field-wrapper">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>API Key</mat-label>
+                      <input matInput formControlName="apiKey">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-field-wrapper">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Secret Key</mat-label>
+                      <input matInput formControlName="secretKey">
+                    </mat-form-field>
+                  </div>
+                </ng-container>
+
+                <!-- Pathao Fields -->
+                <ng-container *ngIf="dataForm.get('providerName')?.value?.includes('Pathao')">
+                   <div class="form-field-wrapper">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Client ID / API Key</mat-label>
+                      <input matInput formControlName="apiKey">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-field-wrapper">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Client Secret / Secret Key</mat-label>
+                      <input matInput formControlName="secretKey">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-field-wrapper">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Store ID</mat-label>
+                      <input matInput formControlName="storeId">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-field-wrapper">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>User Name</mat-label>
+                      <input matInput formControlName="username">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-field-wrapper">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Password</mat-label>
+                      <input matInput formControlName="password">
+                    </mat-form-field>
+                  </div>
+                </ng-container>
+
+                <!-- REDX Fields -->
+                <ng-container *ngIf="dataForm.get('providerName')?.value?.includes('REDX')">
+                  <div class="form-field-wrapper">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Access Token / API Key</mat-label>
+                      <input matInput formControlName="apiKey">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-field-wrapper">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Store ID</mat-label>
+                      <input matInput formControlName="storeId">
+                    </mat-form-field>
+                  </div>
+                </ng-container>
+
+                <div class="form-field-wrapper w-100">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Special Instruction</mat-label>
+                    <textarea matInput formControlName="specialInstruction" rows="2"></textarea>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facebook Catalog Section -->
+        <div class="section-wrapper" *ngIf="selectedSection === 'fbCatalog'">
+          <div class="section-header">
+            <h3>Meta Facebook Catalog Feed</h3>
+            <p>Sync books with Facebook &amp; Instagram Shop, Dynamic Product Ads, and Meta Commerce Manager</p>
+          </div>
+
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 24px; border: 1px solid #e9ecef;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+              <mat-checkbox formControlName="isEnableFacebookCatalog" color="primary">
+                Enable Meta Facebook Catalog Feed
+              </mat-checkbox>
+
+              <a routerLink="/customization/facebook-catalog" mat-stroked-button color="primary">
+                <mat-icon>open_in_new</mat-icon> Open Full Catalog Manager
+              </a>
+            </div>
+          </div>
+
+          <div *ngIf="dataForm.get('isEnableFacebookCatalog')?.value" style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0;">
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-weight: 500; font-size: 13px; color: #444; margin-bottom: 6px;">
+                CSV Data Feed URL (Recommended for Meta Commerce Manager):
+              </label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <mat-form-field appearance="outline" style="flex: 1; margin-bottom: -1.25em;">
+                  <input matInput [value]="feedCsvUrl" readonly>
+                </mat-form-field>
+                <button mat-flat-button color="primary" type="button" (click)="onCopyUrl(feedCsvUrl, 'CSV URL')">
+                  <mat-icon>content_copy</mat-icon> Copy
+                </button>
+                <a [href]="feedCsvUrl" target="_blank" mat-stroked-button color="primary">
+                  <mat-icon>open_in_new</mat-icon>
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <label style="display: block; font-weight: 500; font-size: 13px; color: #444; margin-bottom: 6px;">
+                RSS / XML Data Feed URL:
+              </label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <mat-form-field appearance="outline" style="flex: 1; margin-bottom: -1.25em;">
+                  <input matInput [value]="feedXmlUrl" readonly>
+                </mat-form-field>
+                <button mat-flat-button color="primary" type="button" (click)="onCopyUrl(feedXmlUrl, 'XML URL')">
+                  <mat-icon>content_copy</mat-icon> Copy
+                </button>
+                <a [href]="feedXmlUrl" target="_blank" mat-stroked-button color="primary">
+                  <mat-icon>open_in_new</mat-icon>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit" [disabled]="isLoading">
+            <mat-icon>save</mat-icon>
+            Save All Settings
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- LOADING TEMPLATE -->
+  <ngx-spinner bdColor="rgba(0, 0, 0, 0.5)" size="medium" color="#fff" type="ball-atom" [fullScreen]="false">
+    <p style="color: white"> Processing... </p>
+  </ngx-spinner>
+</section>

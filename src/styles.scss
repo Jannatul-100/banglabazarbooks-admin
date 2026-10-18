@@ -1,0 +1,95 @@
+
+// Core
+@import "src/theme/base";
+@import "src/theme/material/theme";
+@import "src/theme/fonts";
+
+
+
+.my-custom-dialog-class {
+    .mat-dialog-container {
+      height: auto!important;
+    }
+  }
+
+  .mat-dialog-container{
+    height: auto!important;
+  }
+
+  .cdk-overlay-pane{
+    padding: 10px!important;
+  }
+
+
+
+  @media print {
+
+    #header{
+      display: none;
+    }
+    #header1{
+      margin-top: 0px!important;
+      //height: auto!important;
+      min-height: 150mm;
+    }
+
+    #header1::-webkit-scrollbar {
+      display: none!important;
+    }
+
+    #header-data{
+      display: none;
+    }
+
+    #side-data{
+      display: none;
+    }
+    #side-data1{
+      display: none;
+    }
+    #cancel-btn{
+      display: none;
+    }
+
+
+    //body * {
+    //  visibility: hidden;
+    //}
+    //
+    //mat-sidenav-content {
+    //  height: 80vh;
+    //}
+    //
+    //#new-sale-section {
+    //  display: none;
+    //}
+    //
+    //#sale-list-table-view {
+    //  display: none;
+    //}
+    //
+    //#section-pos-print, #section-pos-print * {
+    //  visibility: visible;
+    //}
+    //#section-pos-print {
+    //  position: absolute;
+    //  left: 0!important;
+    //  width: 100mm;
+    //  min-height: 150mm;
+    //  //z-index: 999;
+    //  top: 0px!important;
+    //}
+    //
+    //#list-pos-print, #list-pos-print * {
+    //  visibility: visible;
+    //}
+    //
+    //#list-pos-print {
+    //  position: absolute;
+    //  left: 0;
+    //  top: 0;
+    //  max-height: 400px;
+    //}
+
+
+  }

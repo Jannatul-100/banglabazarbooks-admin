@@ -1,0 +1,430 @@
+<section class="all-orders-page">
+
+  <!-- TOP TOOLBAR -->
+  <div class="orders-toolbar">
+    <div class="toolbar-left">
+      <form class="search-box" #searchForm="ngForm">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input type="text" #searchInput name="searchTerm" autocomplete="off" ngModel
+          placeholder="Search orders, phone, address, product...">
+      </form>
+    </div>
+
+    <div class="toolbar-right">
+      <button mat-stroked-button class="tb-btn" [routerLink]="['../', 'add-order']">
+        <mat-icon>inventory_2</mat-icon>
+        Products
+      </button>
+      <button mat-stroked-button class="tb-btn" (click)="exportToAllExcel()">
+        <mat-icon>download</mat-icon>
+        Download All Orders
+      </button>
+      <button mat-stroked-button class="tb-btn">
+        <mat-icon>description</mat-icon>
+        Download Products Summary
+      </button>
+      <button mat-stroked-button class="tb-btn" (click)="openCourierSelectionDialog()">
+        <mat-icon>sync</mat-icon>
+        Sync Courier Status
+      </button>
+      <div class="per-page-selector">
+        <span>Per Page:</span>
+        <button mat-stroked-button [matMenuTriggerFor]="menuShow" class="per-page-btn">
+          {{ ordersPerPage }}
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #menuShow="matMenu">
+          <button mat-menu-item (click)="SelectChange(10)" [class.dropdown-active]="ordersPerPage === 10">10</button>
+          <button mat-menu-item (click)="SelectChange(20)" [class.dropdown-active]="ordersPerPage === 20">20</button>
+          <button mat-menu-item (click)="SelectChange(30)" [class.dropdown-active]="ordersPerPage === 30">30</button>
+          <button mat-menu-item (click)="SelectChange(50)" [class.dropdown-active]="ordersPerPage === 50">50</button>
+          <button mat-menu-item (click)="SelectChange(100)" [class.dropdown-active]="ordersPerPage === 100">100</button>
+          <button mat-menu-item (click)="SelectChange(200)" [class.dropdown-active]="ordersPerPage === 200">200</button>
+          <button mat-menu-item (click)="SelectChange(300)" [class.dropdown-active]="ordersPerPage === 300">300</button>
+          <button mat-menu-item (click)="SelectChange(500)" [class.dropdown-active]="ordersPerPage === 500">500</button>
+        </mat-menu>
+      </div>
+      <button *ngIf="checkAddPermission" mat-raised-button color="primary" class="add-order-btn"
+        [routerLink]="['../', 'add-order']">
+        <mat-icon>add</mat-icon>
+        Add Order
+      </button>
+    </div>
+  </div>
+  <!-- END TOP TOOLBAR -->
+
+  <!-- STATUS TABS -->
+  <div class="status-tabs-container">
+    <div class="status-tabs-scroll">
+      <span *ngFor="let data of tableTabData" class="status-tab"
+        [class.active-tab]="selectedTab === data.value"
+        (click)="onTabChange(data.value)">
+        {{ data.viewValue }}
+        <span class="tab-badge" [class.active-badge]="selectedTab === data.value">{{ getTabCount(data.value) }}</span>
+      </span>
+    </div>
+    <div class="status-tabs-progress" *ngIf="false"></div>
+  </div>
+  <!-- END STATUS TABS -->
+
+  <!-- FILTER ROW -->
+  <div class="filter-row">
+    <div class="filter-left">
+      <button mat-stroked-button class="filter-btn" *ngIf="activeSort || hasFilter" (click)="onRemoveAllQuery()">
+        <mat-icon>close</mat-icon>
+        Clear Filters
+      </button>
+      <div class="date-range-block">
+        <mat-form-field class="date-field" appearance="outline" (click)="picker.open()">
+          <mat-label>Order Date</mat-label>
+          <mat-date-range-input [formGroup]="dataFormDateRange" [rangePicker]="picker" [max]="today">
+            <input matStartDate formControlName="start" placeholder="Start" readonly>
+            <input matEndDate formControlName="end" placeholder="End" readonly (dateChange)="endChangeRegDateRange($event)">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+      <div class="date-range-block">
+        <mat-form-field class="date-field" appearance="outline" (click)="picker2.open()">
+          <mat-label>Delivery Date</mat-label>
+          <mat-date-range-input [formGroup]="dataFormDeliveryRange" [rangePicker]="picker2" [max]="today">
+            <input matStartDate formControlName="start" placeholder="Start" readonly>
+            <input matEndDate formControlName="end" placeholder="End" readonly (dateChange)="endChangeDeliveryDateRange($event)">
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker2></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="filter-right">
+      <button mat-stroked-button [matMenuTriggerFor]="menuCat" class="filter-select-btn">
+        {{ paymentStatus[activeFilter1]?.viewValue || 'Payment Status' }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menuCat="matMenu">
+        <button *ngFor="let data of paymentStatus; let i = index" mat-menu-item
+          (click)="filterData(data.value, i, 'paymentStatus')" [class.dropdown-active]="activeFilter1 === i">
+          {{ data.viewValue }}
+        </button>
+      </mat-menu>
+
+      <button mat-stroked-button [matMenuTriggerFor]="menuBrand" class="filter-select-btn">
+        {{ paymentTypes[activeFilter2]?.viewValue || 'Payment Type' }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menuBrand="matMenu">
+        <button *ngFor="let data of paymentTypes; let i = index" mat-menu-item
+          (click)="filterData(data.value, i, 'paymentType')" [class.dropdown-active]="activeFilter2 === i">
+          {{ data.viewValue }}
+        </button>
+      </mat-menu>
+
+      <button mat-stroked-button [matMenuTriggerFor]="menuDeliveryStatus" class="filter-select-btn">
+        {{ orderStatus[activeFilter3]?.viewValue || 'Order Status' }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menuDeliveryStatus="matMenu">
+        <button *ngFor="let data of orderStatus; let i = index" mat-menu-item
+          (click)="filterData(data.value, i, 'orderStatus')" [class.dropdown-active]="activeFilter3 === i">
+          {{ data.viewValue }}
+        </button>
+      </mat-menu>
+
+      <button mat-stroked-button [matMenuTriggerFor]="menuAdmin" class="filter-select-btn"
+        *ngIf="admin?.role === 'super_admin' || admin?.role === 'admin'">
+        {{ admins[activeFilterAdmin]?.name || 'Processed By' }}
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #menuAdmin="matMenu">
+        <button *ngFor="let data of admins; let i = index" mat-menu-item
+          (click)="filterData(data._id, i, 'processedBy')" [class.dropdown-active]="activeFilterAdmin === i">
+          {{ data.name }} ({{ data.username }})
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+  <!-- END FILTER ROW -->
+
+  <!-- COLUMNS TOGGLE AREA -->
+  <div class="table-meta-row">
+    <div class="meta-left">
+      <span class="total-badge">
+        Total Orders: <strong>{{ count || 0 }}</strong>
+      </span>
+      <span class="total-badge amount-badge" *ngIf="admin?.showTotalOrderValue">
+        Total Amount: <strong>{{ getAllRepairAmount() }}</strong>
+      </span>
+    </div>
+    <div class="meta-right">
+      <mat-checkbox [(ngModel)]="showCalculation" (ngModelChange)="onChangeShowCalculation($event)" color="primary"
+        *ngIf="admin?.showTotalOrderValue">
+        Show Total Amount
+      </mat-checkbox>
+    </div>
+  </div>
+
+  <!-- ORDERS TABLE -->
+  <div class="orders-table-wrapper">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th class="col-check">
+            <mat-checkbox #matCheckbox (change)="onAllSelectChange($event)"></mat-checkbox>
+          </th>
+          <th class="col-sl">SL</th>
+          <th class="col-product">PRODUCT NAME</th>
+          <th class="col-img">IMAGE</th>
+          <th class="col-gtotal">GRAND TOTAL</th>
+          <th class="col-orderid">ORDER ID</th>
+          <th class="col-orderfrom">ORDER FROM</th>
+          <th class="col-name">NAME</th>
+          <th class="col-phone">PHONE NO</th>
+          <th class="col-status">ORDER STATUS</th>
+          <th class="col-courier">COURIER</th>
+          <th class="col-date">
+            <mat-icon style="font-size:18px; vertical-align:middle;">calendar_today</mat-icon>
+          </th>
+          <th class="col-grandtotal">GRAND TOTAL</th>
+          <th class="col-actions">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container
+          *ngFor="let data of orders | paginate: { itemsPerPage: ordersPerPage, currentPage: currentPage, totalItems: totalOrders }; let i = index">
+          <tr class="order-row" [class.selected-row]="data.select" (click)="toggleRowSelection($event, i, data)">
+            <td class="col-check">
+              <mat-checkbox class="t-mat-checkbox" [(ngModel)]="data.select"
+                (ngModelChange)="onCheckChange($event, i, data._id)" (click)="$event.stopPropagation()"></mat-checkbox>
+            </td>
+            <td class="col-sl">{{ i + 1 }}</td>
+
+            <!-- Product Names -->
+            <td class="col-product">
+              <div class="product-names-list">
+                <div *ngFor="let item of data.orderedItems" class="product-name-row">
+                  <span class="prod-name">{{ item.name }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Product Images -->
+            <td class="col-img">
+              <div class="product-images-list">
+                <div *ngFor="let item of data.orderedItems" class="img-wrap">
+                  <img checkImageDefault [src]="item?.image || ''" alt="" class="prod-img">
+                  <span class="qty-dot">{{ item.quantity }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Grand Total (small, in product column area) -->
+            <td class="col-gtotal">
+              <span class="price-tag">৳ {{ data.grandTotal | number }}</span>
+            </td>
+
+            <!-- Order ID -->
+            <td class="col-orderid">
+              <div class="order-id-block">
+                <span class="order-id-num">{{ data.orderId }}</span>
+                <span *ngIf="data.hasPreOrder" class="pre-order-badge">PRE-ORDER</span>
+                <span class="order-type-label" *ngIf="data.previousOrderCount > 0">
+                  OLD ORDERS +{{ data.previousOrderCount }}
+                </span>
+                <span class="order-type-label new-label" *ngIf="!data.previousOrderCount">
+                  NEW ORDER
+                </span>
+              </div>
+            </td>
+
+            <!-- Order From -->
+            <td class="col-orderfrom">
+              <span class="order-from-badge"
+                    [class.from-admin]="(data.orderFrom || (data.createdByAdmin ? 'Admin' : 'Website')) === 'Admin'">
+                {{ data.orderFrom || (data.createdByAdmin ? 'Admin' : 'Website') }}
+              </span>
+            </td>
+
+            <!-- Customer Name & Address -->
+            <td class="col-name">
+              <div class="customer-block">
+                <span class="cust-name">{{ data.name }}</span>
+                <span class="cust-address">{{ data.shippingAddress }}</span>
+                <div class="fraud-info" *ngIf="data?.fraudChecker?.courierData?.summary">
+                  <span class="fraud-ratio" [class.fraud-low]="(data.fraudChecker.courierData.summary.success_ratio || 0) < 70">
+                    {{ data.fraudChecker.courierData.summary.success_ratio || 0 }}%
+                    ({{ data.fraudChecker.courierData.summary.total_parcel || 0 }})
+                  </span>
+                  <a class="view-details-link" [routerLink]="['../', 'order-details', data._id]">View Details</a>
+                </div>
+                <div *ngIf="!data?.fraudChecker?.courierData?.summary">
+                  <span class="fraud-ratio">0% (0)</span>
+                  <a class="view-details-link" [routerLink]="['../', 'order-details', data._id]">View Details</a>
+                </div>
+              </div>
+            </td>
+
+            <!-- Phone -->
+            <td class="col-phone">
+              <div class="phone-block">
+                <div class="phone-and-logo" style="display: flex; align-items: center; gap: 8px;">
+                  <span class="phone-num">{{ data.phoneNo }}</span>
+                  <img *ngIf="data.courierData?.providerName === 'Sundarban Courier'" 
+                       src="assets/images/logo/sundarban.jpg" 
+                       alt="Sundarban Courier" 
+                       class="sundarban-logo"
+                       title="Sundarban Courier">
+                </div>
+                <div class="phone-actions">
+                  <a [href]="'https://wa.me/88' + data.phoneNo" target="_blank" class="icon-btn wa-btn" title="WhatsApp"
+                    (click)="$event.stopPropagation()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                  </a>
+                  <a [href]="'tel:' + data.phoneNo" class="icon-btn call-btn" title="Call"
+                    (click)="$event.stopPropagation()">
+                    <mat-icon>phone</mat-icon>
+                  </a>
+                </div>
+              </div>
+            </td>
+
+            <!-- Order Status -->
+            <td class="col-status">
+              <button class="confirm-status-btn"
+                [class.status-pending]="data.orderStatus === 'pending'"
+                [class.status-confirm]="data.orderStatus === 'confirm'"
+                [class.status-processing]="data.orderStatus === 'processing'"
+                [class.status-shipped]="data.orderStatus === 'shipping'"
+                [class.status-delivered]="data.orderStatus === 'delivered'"
+                [class.status-cancel]="data.orderStatus === 'cancel'"
+                (click)="openUpdateOrderStatusDialog(data); $event.stopPropagation()">
+                {{ data.orderStatus | orderStatus }}
+              </button>
+            </td>
+
+            <!-- Courier -->
+            <td class="col-courier">
+              <div class="courier-cell" *ngIf="data?.courierData?.providerName">
+                <span class="courier-name">{{ data?.courierData?.providerName }}</span>
+                <span class="tracking-id" *ngIf="data?.courierData?.trackingId || data?.courierData?.consignmentId"
+                  (click)="copyToClipboard($event, data?.courierData?.trackingId || data?.courierData?.consignmentId)">
+                  {{ data?.courierData?.trackingId || data?.courierData?.consignmentId }}
+                  <mat-icon>content_copy</mat-icon>
+                </span>
+              </div>
+              <span *ngIf="!data?.courierData?.providerName" class="no-courier">-</span>
+            </td>
+
+            <!-- Date -->
+            <td class="col-date">
+              <span class="order-date">{{ data.createdAt | date: 'd MMM y' }}</span>
+              <span class="order-time">{{ data.createdAt | date: 'h:mm a' }}</span>
+            </td>
+
+            <!-- Grand Total (right column) -->
+            <td class="col-grandtotal">
+              <span class="grand-total-val">৳ {{ data.grandTotal | number }}</span>
+            </td>
+
+            <!-- Actions -->
+            <td class="col-actions">
+              <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()"
+                class="action-menu-btn" aria-label="Actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #rowMenu="matMenu">
+                <button mat-menu-item [disabled]="!checkEditPermission" (click)="openUpdateOrderStatusDialog(data)">
+                  <mat-icon>edit</mat-icon> Edit Status
+                </button>
+                <button mat-menu-item [routerLink]="['../','order-details', data._id]">
+                  <mat-icon>visibility</mat-icon> View Details
+                </button>
+                <button mat-menu-item *ngIf="data.courierLink" [href]="data.courierLink" target="_blank">
+                  <mat-icon>location_on</mat-icon> Track Parcel
+                </button>
+              </mat-menu>
+            </td>
+          </tr>
+        </ng-container>
+
+        <!-- Empty State -->
+        <tr *ngIf="!orders?.length">
+          <td colspan="14" class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <p>No orders found</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- END ORDERS TABLE -->
+
+  <!-- PAGINATION -->
+  <div class="pagination-container">
+    <pagination-controls class="data-pagination" [autoHide]="true" [maxSize]="15"
+      (pageChange)="onPageChanged($event)">
+    </pagination-controls>
+  </div>
+
+  <!-- BOTTOM BULK BAR -->
+  <div class="bottom-bulk-bar" [class.active]="selectedIds.length > 0">
+    <div class="bar-content">
+      <div class="selection-info">
+        <span class="count">{{ selectedIds.length }}</span>
+        <span class="text">Items selected</span>
+      </div>
+
+      <div class="bar-actions">
+        <button mat-button class="btn-clear" (click)="clearSelection()">
+          <mat-icon>close</mat-icon> Clear
+        </button>
+        <button mat-raised-button color="primary" class="btn-excel" (click)="exportToAllExcel()">
+          <mat-icon>file_download</mat-icon> Excel
+        </button>
+        <button mat-raised-button color="primary" class="btn-print" (click)="onMultiplePrint()">
+          <mat-icon>print</mat-icon> Print
+        </button>
+        <button mat-raised-button color="primary" class="btn-print" (click)="onMultipleStickerPrint()">
+          <mat-icon>print</mat-icon> Sticker
+        </button>
+        <button mat-raised-button color="warn" class="btn-fraud" (click)="onCheckBulkFraud()">
+          <mat-icon>security</mat-icon> Fraud Check
+        </button>
+        <button mat-raised-button color="accent" class="btn-reports" (click)="openSelectedOrdersReport()">
+          <mat-icon>bar_chart</mat-icon> Report
+        </button>
+        <button mat-raised-button color="primary" class="btn-courier" (click)="openCourierSelectionDialog()">
+          <mat-icon>local_shipping</mat-icon> Courier
+        </button>
+        <button mat-raised-button color="primary" class="btn-status" (click)="openUpdateOrderStatusDialogs()">
+          <mat-icon>edit</mat-icon> Change Status
+        </button>
+        <button mat-raised-button color="primary" class="btn-status" [matMenuTriggerFor]="bulkStatusMenu">
+          Quick Status <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #bulkStatusMenu="matMenu">
+          <button mat-menu-item (click)="onChangeBulkStatus('pending')">Pending</button>
+          <button mat-menu-item (click)="onChangeBulkStatus('confirm')">Confirm</button>
+          <button mat-menu-item (click)="onChangeBulkStatus('processing')">Processing</button>
+          <button mat-menu-item (click)="onChangeBulkStatus('shipping')">Shipping</button>
+          <button mat-menu-item (click)="onChangeBulkStatus('sent_to_courier')">Sent to Courier</button>
+          <button mat-menu-item (click)="onChangeBulkStatus('delivered')">Delivered</button>
+          <button mat-menu-item (click)="onChangeBulkStatus('cancel')">Cancel</button>
+          <button mat-menu-item (click)="onChangeBulkStatus('return')">Return</button>
+        </mat-menu>
+        <button mat-raised-button color="warn" class="btn-delete" (click)="openConfirmDialog('delete')">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <ngx-spinner bdColor="rgba(0, 0, 0, 0.5)" size="medium" color="#fff" type="ball-atom" [fullScreen]="false">
+    <p style="color: white">Loading...</p>
+  </ngx-spinner>
+
+</section>

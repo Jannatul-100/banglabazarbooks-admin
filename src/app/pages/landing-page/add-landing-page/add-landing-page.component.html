@@ -1,0 +1,317 @@
+<div class="header">
+  <button mat-raised-button color="primary" (click)="onSubmit()">
+    <mat-icon>done</mat-icon>
+    {{ id ? 'Update' : 'Save' }} Landing Page
+  </button>
+</div>
+
+<section class="admin-data-sec">
+  <div class="top-data-header">
+    <div class="title">
+      <h2>{{ id ? 'Update' : 'Create' }} {{ isV2Template ? 'Landing Page 2' : 'Landing Page' }}</h2>
+    </div>
+  </div>
+  <hr class="center-square">
+
+  <form #formElement="ngForm" [formGroup]="dataForm" fxLayout="row wrap">
+    <h3 class="section-title" fxFlex="100">Basic Info</h3>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="50">
+      <mat-label>Name</mat-label>
+      <input formControlName="name" matInput required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="50">
+      <mat-label>Slug</mat-label>
+      <input formControlName="slug" matInput required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="50">
+      <mat-label>Template</mat-label>
+      <mat-select formControlName="template">
+        <mat-option value="v1">Landing Page 1 (Book Sales)</mat-option>
+        <mat-option value="v2">Landing Page 2 (Lead Gen / Download)</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="50">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="publish">Publish</mat-option>
+        <mat-option value="draft">Draft</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="50">
+      <mat-label>Priority</mat-label>
+      <input formControlName="priority" digitOnly matInput>
+    </mat-form-field>
+
+    <mat-form-field *ngIf="isV2Template" appearance="outline" class="w-100 px-1" fxFlex="50">
+      <mat-label>Brand Tagline</mat-label>
+      <input formControlName="brandTagline" matInput>
+    </mat-form-field>
+
+    <h3 class="section-title" fxFlex="100">Hero Section</h3>
+
+    <div class="form-img-avatar" fxFlex="100" (click)="openHeroGalleryDialog()">
+      <img [src]="pickedHeroImage" alt="Hero image">
+      <p>Click to select hero / book cover image</p>
+    </div>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="50">
+      <mat-label>Badge Text</mat-label>
+      <input formControlName="badgeText" matInput>
+    </mat-form-field>
+
+    <mat-form-field
+      appearance="outline"
+      class="w-100 px-1"
+      fxFlex="50">
+      <mat-label>Primary Color</mat-label>
+      <input formControlName="primaryColor" matInput type="color">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+      <mat-label>Title</mat-label>
+      <input formControlName="title" matInput>
+    </mat-form-field>
+
+    <mat-form-field *ngIf="isV2Template" appearance="outline" class="w-100 px-1" fxFlex="100">
+      <mat-label>Title Highlight (blue text)</mat-label>
+      <input formControlName="titleHighlight" matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+      <mat-label>Subtitle</mat-label>
+      <input formControlName="subtitle" matInput>
+    </mat-form-field>
+
+    <ng-container *ngIf="!isV2Template">
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="33">
+        <mat-label>Original Price</mat-label>
+        <input formControlName="originalPrice" digitOnly matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="33">
+        <mat-label>Sale Price</mat-label>
+        <input formControlName="salePrice" digitOnly matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="33">
+        <mat-label>Discount %</mat-label>
+        <input formControlName="discountPercent" digitOnly matInput>
+      </mat-form-field>
+    </ng-container>
+
+    <ng-container *ngIf="isV2Template">
+      <h3 class="section-title" fxFlex="100">Hero Points</h3>
+      <div class="w-100 px-1 feature-block" fxFlex="100" *ngFor="let point of heroPoints; let i = index">
+        <mat-form-field appearance="outline" fxFlex="90">
+          <mat-label>Hero Point {{ i + 1 }}</mat-label>
+          <input [(ngModel)]="heroPoints[i]" [ngModelOptions]="{standalone: true}" matInput>
+        </mat-form-field>
+        <button type="button" mat-icon-button color="warn" (click)="removeHeroPoint(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+      <button type="button" mat-stroked-button color="primary" (click)="addHeroPoint()">Add Hero Point</button>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="50">
+        <mat-label>Resource Card Title</mat-label>
+        <input formControlName="resourceCardTitle" matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="50">
+        <mat-label>Resource Card Subtitle</mat-label>
+        <input formControlName="resourceCardSubtitle" matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>Download File URL (PDF)</mat-label>
+        <input formControlName="downloadFileUrl" matInput placeholder="https://...">
+      </mat-form-field>
+    </ng-container>
+
+    <h3 class="section-title" fxFlex="100">Content</h3>
+
+    <div class="editor-block w-100 px-1" fxFlex="100">
+      <label class="editor-label">বিবরণ (Description)</label>
+      <app-html-editor formControlName="description"></app-html-editor>
+    </div>
+
+    <div class="editor-block w-100 px-1" fxFlex="100">
+      <label class="editor-label">প্রয়োজনীয় তথ্য</label>
+      <app-html-editor formControlName="featuresContent"></app-html-editor>
+    </div>
+
+    <ng-container *ngIf="!isV2Template">
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>প্রয়োজনীয় তথ্য Section Title</mat-label>
+        <input formControlName="featuresTitle" matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>Inside Pages Section Title</mat-label>
+        <input formControlName="insidePagesTitle" matInput>
+      </mat-form-field>
+
+      <div class="w-100 px-1" fxFlex="100">
+        <button type="button" mat-stroked-button color="accent" (click)="openInsidePagesGalleryDialog()">
+          Add Inside Page Images
+        </button>
+        <div class="inside-pages">
+          <div class="inside-page" *ngFor="let page of insidePages; let i = index">
+            <img [src]="page" alt="">
+            <button type="button" mat-icon-button color="warn" (click)="removeInsidePage(i)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-title" fxFlex="100">Trust Bar</h3>
+      <div class="w-100 px-1 feature-block" fxFlex="100" *ngFor="let item of trustItems; let i = index">
+        <mat-form-field appearance="outline" fxFlex="25">
+          <mat-label>Icon (fa-*)</mat-label>
+          <input [(ngModel)]="item.icon" [ngModelOptions]="{standalone: true}" matInput>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="35">
+          <mat-label>Title</mat-label>
+          <input [(ngModel)]="item.title" [ngModelOptions]="{standalone: true}" matInput>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="30">
+          <mat-label>Subtitle</mat-label>
+          <input [(ngModel)]="item.subtitle" [ngModelOptions]="{standalone: true}" matInput>
+        </mat-form-field>
+        <button type="button" mat-icon-button color="warn" (click)="removeTrustItem(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+      <button type="button" mat-stroked-button color="primary" (click)="addTrustItem()">Add Trust Item</button>
+
+      <h3 class="section-title" fxFlex="100">Products</h3>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>Product Section Title</mat-label>
+        <input formControlName="productSectionTitle" matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>Product Section Subtitle</mat-label>
+        <input formControlName="productSectionSubtitle" matInput>
+      </mat-form-field>
+
+      <div class="table-wrapper space w-100" fxFlex="100">
+        <div class="table-action dual">
+          <div class="left">Selected Products: {{ selectedProducts.length }}</div>
+          <div class="right">
+            <button mat-raised-button color="accent" type="button" (click)="openProductListDialog()">
+              <mat-icon>add</mat-icon>
+              Select Products
+            </button>
+          </div>
+        </div>
+        <table>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Action</th>
+          </tr>
+          <tr *ngFor="let product of selectedProducts; let i = index">
+            <td><img class="table-image" [src]="product.images?.[0]" alt=""></td>
+            <td>{{ product.name }}</td>
+            <td>৳{{ product.salePrice }}</td>
+            <td>
+              <button type="button" mat-icon-button color="warn" (click)="removeProduct(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="isV2Template">
+      <h3 class="section-title" fxFlex="100">Lead Form Section</h3>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>Form Title</mat-label>
+        <input formControlName="leadFormTitle" matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>Form Subtitle</mat-label>
+        <input formControlName="leadFormSubtitle" matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>Form Note (green text)</mat-label>
+        <input formControlName="leadFormNote" matInput>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>Download Button Text</mat-label>
+        <input formControlName="leadFormButtonText" matInput>
+      </mat-form-field>
+
+      <div class="w-100 px-1 feature-block" fxFlex="100" *ngFor="let item of leadFormTrustItems; let i = index">
+        <mat-form-field appearance="outline" fxFlex="20">
+          <mat-label>Icon</mat-label>
+          <input [(ngModel)]="item.icon" [ngModelOptions]="{standalone: true}" matInput placeholder="lock, bolt, shield">
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="35">
+          <mat-label>Title</mat-label>
+          <input [(ngModel)]="item.title" [ngModelOptions]="{standalone: true}" matInput>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="35">
+          <mat-label>Subtitle</mat-label>
+          <input [(ngModel)]="item.subtitle" [ngModelOptions]="{standalone: true}" matInput>
+        </mat-form-field>
+        <button type="button" mat-icon-button color="warn" (click)="removeLeadTrustItem(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+      <button type="button" mat-stroked-button color="primary" (click)="addLeadTrustItem()">Add Form Trust Item</button>
+
+      <h3 class="section-title" fxFlex="100">Benefits Section</h3>
+
+      <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+        <mat-label>Benefits Title</mat-label>
+        <input formControlName="benefitsTitle" matInput>
+      </mat-form-field>
+
+      <div class="w-100 px-1 feature-block" fxFlex="100" *ngFor="let card of benefitCards; let i = index">
+        <mat-form-field appearance="outline" fxFlex="20">
+          <mat-label>Icon</mat-label>
+          <input [(ngModel)]="card.icon" [ngModelOptions]="{standalone: true}" matInput placeholder="checklist, target">
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="30">
+          <mat-label>Title</mat-label>
+          <input [(ngModel)]="card.title" [ngModelOptions]="{standalone: true}" matInput>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="40">
+          <mat-label>Description</mat-label>
+          <input [(ngModel)]="card.description" [ngModelOptions]="{standalone: true}" matInput>
+        </mat-form-field>
+        <button type="button" mat-icon-button color="warn" (click)="removeBenefitCard(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+      <button type="button" mat-stroked-button color="primary" (click)="addBenefitCard()">Add Benefit Card</button>
+    </ng-container>
+
+    <h3 class="section-title" fxFlex="100">SEO</h3>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+      <mat-label>SEO Title</mat-label>
+      <input formControlName="seoTitle" matInput>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 px-1" fxFlex="100">
+      <mat-label>SEO Description</mat-label>
+      <textarea formControlName="seoDescription" matInput rows="3"></textarea>
+    </mat-form-field>
+  </form>
+</section>

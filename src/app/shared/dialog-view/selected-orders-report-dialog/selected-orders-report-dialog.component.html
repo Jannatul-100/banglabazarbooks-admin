@@ -1,0 +1,62 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="header-title">
+      <mat-icon class="title-icon">dashboard_customize</mat-icon>
+      <h2>Orders Summary Report</h2>
+    </div>
+    <button mat-icon-button (click)="dialogRef.close()" class="close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content" id="report-print-section">
+    <div class="print-header hide-on-screen">
+      <h2>Orders Summary Report</h2>
+      <p class="print-date">Generated on: {{ currentDateTime() }}</p>
+    </div>
+
+    <div class="report-body">
+      <div *ngFor="let group of groupedReportData" class="publisher-group">
+        <h3 class="publisher-title">
+          <span>Publisher: {{ group.publisherName }}</span>
+          <span class="pub-count">({{ group.items.length }} items)</span>
+        </h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th class="sl-col">SL</th>
+                <th>Product Name</th>
+                <th>Writer Name</th>
+                <th class="qty-col">Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of group.items; let i = index">
+                <td class="sl-col">{{ i + 1 }}</td>
+                <td class="product-name">{{ item.productName }}</td>
+                <td class="writer-name">{{ item.writerName || 'N/A' }}</td>
+                <td class="qty-col font-weight-bold">{{ item.totalQuantity }}</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="3" class="text-right">Subtotal Quantity:</td>
+                <td class="qty-col font-weight-bold total-val">{{ group.totalQuantity }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grand-total-box">
+        Total Products Ordered: <span>{{ getTotalQuantity() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button mat-button class="cancel-btn" (click)="dialogRef.close()">Close</button>
+    <button mat-raised-button color="primary" class="print-btn" (click)="printReport()">
+      <mat-icon>local_printshop</mat-icon> Print Report
+    </button>
+  </div>
+</div>

@@ -1,0 +1,734 @@
+<div class="moderator-activity-container">
+  <!-- Top Header -->
+  <div class="page-header">
+    <div class="title-area">
+      <div class="icon-circle">
+        <mat-icon>manage_accounts</mat-icon>
+      </div>
+      <div>
+        <h1>মডারেটর অ্যাক্টিভিটি ট্র্যাকিং</h1>
+        <p class="subtitle">মডারেটরদের কাজের চাপ, অ্যাক্টিভিটি রিপোর্ট এবং জবাবদিহিতা ড্যাশবোর্ড</p>
+      </div>
+    </div>
+    <div class="action-buttons">
+      <button mat-stroked-button color="primary" (click)="fetchReport()" [disabled]="isLoading">
+        <mat-icon>refresh</mat-icon> Refresh
+      </button>
+      <button mat-raised-button color="accent" (click)="exportToExcel()" [disabled]="isLoading || !logs.length">
+        <mat-icon>download</mat-icon> Export Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="filter-card mat-elevation-z1">
+    <div class="filter-row primary-filters">
+      <!-- Moderator Select -->
+      <div class="filter-item">
+        <label>মডারেটর নির্বাচন</label>
+        <mat-form-field appearance="outline" class="density-compact">
+          <mat-select [(ngModel)]="selectedAdminId" (selectionChange)="onFilterChange()">
+            <mat-option value="all">
+              <span class="moderator-option">
+                <strong>সকল মডারেটর / কর্মী (All)</strong>
+              </span>
+            </mat-option>
+            <mat-option *ngFor="let adm of allAdmins" [value]="adm._id">
+              <span class="moderator-option">
+                {{ adm.name || adm.username }} <small>({{ adm.role }})</small>
+              </span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Action Type Select -->
+      <div class="filter-item">
+        <label>অ্যাকশন টাইপ</label>
+        <mat-form-field appearance="outline" class="density-compact">
+          <mat-select [(ngModel)]="selectedAction" (selectionChange)="onFilterChange()">
+            <mat-option value="all">সকল অ্যাকশন (All Actions)</mat-option>
+            <mat-option value="Order Created">নতুন অর্ডার তৈরি (Order Created)</mat-option>
+            <mat-option value="Status Changed">স্ট্যাটাস পরিবর্তন (Status Changed)</mat-option>
+            <mat-option value="Order Edited">অর্ডার এডিট (Order Edited)</mat-option>
+            <mat-option value="Sent to Courier">কুরিয়ারে প্রেরণ (Sent to Courier)</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="filter-item search-item">
+        <label>অর্ডার / কাস্টমার সার্চ</label>
+        <mat-form-field appearance="outline" class="density-compact">
+          <input
+            matInput
+            placeholder="অর্ডার নম্বর, ফোন বা কাস্টমার নাম..."
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="onFilterChange()"
+          />
+          <button mat-icon-button matSuffix *ngIf="searchQuery" (click)="clearSearch()">
+            <mat-icon>clear</mat-icon>
+          </button>
+          <button mat-icon-button matSuffix (click)="onFilterChange()">
+            <mat-icon>search</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Date Range Shortcuts -->
+    <div class="date-shortcuts-row">
+      <span class="label">সময়কাল:</span>
+      <div class="date-pills">
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="dateShortcut === 'today'"
+          (click)="setDateShortcut('today')"
+        >
+          আজকে (Today)
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="dateShortcut === 'yesterday'"
+          (click)="setDateShortcut('yesterday')"
+        >
+          গতকাল (Yesterday)
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="dateShortcut === 'last7'"
+          (click)="setDateShortcut('last7')"
+        >
+          গত ৭ দিন (Last 7 Days)
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="dateShortcut === 'thisMonth'"
+          (click)="setDateShortcut('thisMonth')"
+        >
+          এই মাস (This Month)
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="dateShortcut === 'lastMonth'"
+          (click)="setDateShortcut('lastMonth')"
+        >
+          গত মাস (Last Month)
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="dateShortcut === 'last30'"
+          (click)="setDateShortcut('last30')"
+        >
+          গত ৩০ দিন (Last 30 Days)
+        </button>
+        <button
+          type="button"
+          class="pill-btn"
+          [class.active]="dateShortcut === 'all'"
+          (click)="setDateShortcut('all')"
+        >
+          সব সময় (All Time)
+        </button>
+      </div>
+
+      <!-- Custom Date Inputs -->
+      <div class="custom-date-inputs">
+        <mat-form-field appearance="outline" class="density-compact date-field">
+          <mat-label>শুরু</mat-label>
+          <input matInput [matDatepicker]="pickerStart" [(ngModel)]="startDate" (dateChange)="onCustomDateChange()">
+          <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+          <mat-datepicker #pickerStart></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="density-compact date-field">
+          <mat-label>শেষ</mat-label>
+          <input matInput [matDatepicker]="pickerEnd" [(ngModel)]="endDate" (dateChange)="onCustomDateChange()">
+          <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+          <mat-datepicker #pickerEnd></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP DELIVERED MODERATOR HIGHLIGHT & STATUS BREAKDOWN SECTION -->
+  <div class="top-performance-row">
+    <!-- Top Moderator Trophy Card -->
+    <div class="top-moderator-banner mat-elevation-z1" *ngIf="topModerator && topModerator.delivered > 0; else noTopMod">
+      <div class="trophy-badge">
+        <mat-icon>emoji_events</mat-icon>
+        <span>#১ সর্বোচ্চ ডেলিভারি মডারেটর</span>
+      </div>
+      <div class="banner-body">
+        <div class="mod-profile">
+          <div class="avatar-trophy">
+            <span *ngIf="!topModerator.profileImg">{{ getAdminInitials(topModerator.name) }}</span>
+            <img *ngIf="topModerator.profileImg" [src]="topModerator.profileImg" alt="Profile" />
+            <div class="crown-icon">👑</div>
+          </div>
+          <div class="profile-meta">
+            <h2>{{ topModerator.name }}</h2>
+            <span class="username">@{{ topModerator.username }} &bull; {{ topModerator.role }}</span>
+            <span class="highlight-tag">সর্বাধিক অর্ডার সফলভাবে কাস্টমারের কাছে পৌঁছেছে</span>
+          </div>
+        </div>
+
+        <div class="mod-metrics-grid">
+          <div class="metric-box delivered-box">
+            <span class="metric-num">{{ topModerator.delivered }}</span>
+            <span class="metric-lbl">সফল ডেলিভার্ড অর্ডার</span>
+          </div>
+          <div class="metric-box rate-box">
+            <span class="metric-num">{{ topModerator.deliveryRate }}%</span>
+            <span class="metric-lbl">ডেলিভারি সাকসেস রেট</span>
+          </div>
+          <div class="metric-box confirmed-box">
+            <span class="metric-num">{{ topModerator.totalConfirmed }}</span>
+            <span class="metric-lbl">মোট কনফার্মড অর্ডার</span>
+          </div>
+          <div class="metric-box revenue-box">
+            <span class="metric-num">৳{{ topModerator.deliveredAmount | number : '': 'bn' }}</span>
+            <span class="metric-lbl">ডেলিভার্ড রাজস্ব মূল্য</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noTopMod>
+      <div class="top-moderator-banner empty-banner mat-elevation-z1">
+        <div class="trophy-badge gray-badge">
+          <mat-icon>military_tech</mat-icon>
+          <span>সর্বোচ্চ ডেলিভারি মডারেটর</span>
+        </div>
+        <div class="banner-empty-body">
+          <mat-icon>info</mat-icon>
+          <p>নির্বাচিত সময়সীমায় এখনো কোনো কনফার্মড অর্ডার সফলভাবে ডেলিভারি সম্পন্ন হয়নি বা কোনো মডারেটরের রেকর্ড নেই।</p>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- ORDER STATUS BREAKDOWN (কোন স্ট্যাটাসে কতগুলো অর্ডার আছে) -->
+  <div class="section-card mat-elevation-z1">
+    <div class="section-header">
+      <h2>
+        <mat-icon>pie_chart</mat-icon> বর্তমান অর্ডার স্ট্যাটাস ব্রেকডাউন (Order Status Breakdown)
+      </h2>
+      <span class="hint">সিস্টেমের মোট {{ statusSummary?.totalOrders || 0 }} টি অর্ডারের বর্তমান অবস্থা</span>
+    </div>
+
+    <div class="status-summary-grid">
+      <!-- Total Orders -->
+      <div class="status-card-box card-all">
+        <div class="sc-header">
+          <mat-icon>shopping_bag</mat-icon>
+          <span class="sc-name">মোট অর্ডার</span>
+        </div>
+        <div class="sc-val">{{ statusSummary?.totalOrders || 0 }}</div>
+        <div class="sc-sub">৳{{ statusSummary?.totalAmount | number : '': 'bn' }}</div>
+      </div>
+
+      <!-- Pending -->
+      <div class="status-card-box card-pending">
+        <div class="sc-header">
+          <mat-icon>hourglass_empty</mat-icon>
+          <span class="sc-name">পেন্ডিং (Pending)</span>
+        </div>
+        <div class="sc-val">{{ statusSummary?.pending || 0 }}</div>
+        <div class="sc-sub" *ngIf="statusSummary?.totalOrders">
+          {{ ((statusSummary.pending / statusSummary.totalOrders) * 100).toFixed(1) }}% মোট অর্ডারের
+        </div>
+      </div>
+
+      <!-- Confirmed -->
+      <div class="status-card-box card-confirm">
+        <div class="sc-header">
+          <mat-icon>thumb_up_alt</mat-icon>
+          <span class="sc-name">কনফার্মড (Confirmed)</span>
+        </div>
+        <div class="sc-val">{{ statusSummary?.confirm || 0 }}</div>
+        <div class="sc-sub" *ngIf="statusSummary?.totalOrders">
+          {{ ((statusSummary.confirm / statusSummary.totalOrders) * 100).toFixed(1) }}% মোট অর্ডারের
+        </div>
+      </div>
+
+      <!-- Processing -->
+      <div class="status-card-box card-processing">
+        <div class="sc-header">
+          <mat-icon>sync</mat-icon>
+          <span class="sc-name">প্রসেসিং (Processing)</span>
+        </div>
+        <div class="sc-val">{{ statusSummary?.processing || 0 }}</div>
+        <div class="sc-sub" *ngIf="statusSummary?.totalOrders">
+          {{ ((statusSummary.processing / statusSummary.totalOrders) * 100).toFixed(1) }}% মোট অর্ডারের
+        </div>
+      </div>
+
+      <!-- Sent to Courier -->
+      <div class="status-card-box card-courier">
+        <div class="sc-header">
+          <mat-icon>inventory_2</mat-icon>
+          <span class="sc-name">কুরিয়ারে পাঠানো (Sent to Courier)</span>
+        </div>
+        <div class="sc-val">{{ statusSummary?.sentToCourier || 0 }}</div>
+        <div class="sc-sub" *ngIf="statusSummary?.totalOrders">
+          {{ ((statusSummary.sentToCourier / statusSummary.totalOrders) * 100).toFixed(1) }}% মোট অর্ডারের
+        </div>
+      </div>
+
+      <!-- Shipping / In Transit -->
+      <div class="status-card-box card-shipping">
+        <div class="sc-header">
+          <mat-icon>local_shipping</mat-icon>
+          <span class="sc-name">শিপিং / পথে আছে (Shipping)</span>
+        </div>
+        <div class="sc-val">{{ statusSummary?.shipping || 0 }}</div>
+        <div class="sc-sub" *ngIf="statusSummary?.totalOrders">
+          {{ ((statusSummary.shipping / statusSummary.totalOrders) * 100).toFixed(1) }}% মোট অর্ডারের
+        </div>
+      </div>
+
+      <!-- Delivered -->
+      <div class="status-card-box card-delivered">
+        <div class="sc-header">
+          <mat-icon>verified</mat-icon>
+          <span class="sc-name">সফল ডেলিভার্ড (Delivered)</span>
+        </div>
+        <div class="sc-val text-green">{{ statusSummary?.delivered || 0 }}</div>
+        <div class="sc-sub text-green-dark" *ngIf="statusSummary?.totalOrders">
+          {{ ((statusSummary.delivered / statusSummary.totalOrders) * 100).toFixed(1) }}% মোট ডেলিভারি রেট
+        </div>
+      </div>
+
+      <!-- Cancelled -->
+      <div class="status-card-box card-cancelled">
+        <div class="sc-header">
+          <mat-icon>cancel</mat-icon>
+          <span class="sc-name">বাতিল (Cancelled)</span>
+        </div>
+        <div class="sc-val text-red">{{ statusSummary?.cancel || 0 }}</div>
+        <div class="sc-sub" *ngIf="statusSummary?.totalOrders">
+          {{ ((statusSummary.cancel / statusSummary.totalOrders) * 100).toFixed(1) }}% মোট অর্ডারের
+        </div>
+      </div>
+
+      <!-- Refunded -->
+      <div class="status-card-box card-refunded">
+        <div class="sc-header">
+          <mat-icon>currency_exchange</mat-icon>
+          <span class="sc-name">রিফান্ড (Refunded)</span>
+        </div>
+        <div class="sc-val">{{ statusSummary?.refund || 0 }}</div>
+        <div class="sc-sub" *ngIf="statusSummary?.totalOrders">
+          {{ ((statusSummary.refund / statusSummary.totalOrders) * 100).toFixed(1) }}% মোট অর্ডারের
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODERATOR DELIVERY LEADERBOARD (কোন মডারেটরের কনফার্ম করা অর্ডার বেশি ডেলিভারি হয়েছে) -->
+  <div class="section-card mat-elevation-z1" *ngIf="deliveryLeaderboard && deliveryLeaderboard.length > 0">
+    <div class="section-header">
+      <h2>
+        <mat-icon>military_tech</mat-icon> মডারেটর ডেলিভারি পারফরম্যান্স লিডারবোর্ড (Moderator Delivery Success Ranking)
+      </h2>
+      <span class="hint">যেসব মডারেটরের কনফার্ম করা অর্ডার সবচেয়ে বেশি সফল ডেলিভারি হয়েছে তাদের তালিকা</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th class="text-center">র‍্যাঙ্ক</th>
+            <th>মডারেটর / কর্মী</th>
+            <th class="text-center">মোট কনফার্মড</th>
+            <th class="text-center">সফল ডেলিভার্ড</th>
+            <th class="text-center">কুরিয়ার / শিপিং</th>
+            <th class="text-center">প্রসেসিং</th>
+            <th class="text-center">বাতিল / রিফান্ড</th>
+            <th class="text-center">ডেলিভারি সাকসেস রেট</th>
+            <th class="text-right">ডেলিভার্ড রাজস্ব (BDT)</th>
+            <th class="text-center">অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let leader of deliveryLeaderboard; let idx = index" [class.top-rank-row]="idx === 0 && leader.delivered > 0">
+            <!-- Rank -->
+            <td class="text-center rank-cell">
+              <span class="rank-badge gold" *ngIf="idx === 0 && leader.delivered > 0">#১ 🥇</span>
+              <span class="rank-badge silver" *ngIf="idx === 1 && leader.delivered > 0">#২ 🥈</span>
+              <span class="rank-badge bronze" *ngIf="idx === 2 && leader.delivered > 0">#৩ 🥉</span>
+              <span class="rank-badge plain" *ngIf="idx > 2 || leader.delivered === 0">#{{ idx + 1 }}</span>
+            </td>
+
+            <!-- Moderator Info -->
+            <td>
+              <div class="leader-mod-cell">
+                <div class="cell-avatar">{{ getAdminInitials(leader.name) }}</div>
+                <div>
+                  <div class="cell-name">
+                    {{ leader.name || leader.username }}
+                    <span class="winner-tag" *ngIf="idx === 0 && leader.delivered > 0">সর্বোচ্চ ডেলিভারি</span>
+                  </div>
+                  <div class="cell-role-tag">@{{ leader.username }} &bull; {{ leader.role }}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Total Confirmed -->
+            <td class="text-center">
+              <span class="bubble bubble-confirmed">{{ leader.totalConfirmed }}</span>
+            </td>
+
+            <!-- Delivered -->
+            <td class="text-center">
+              <span class="bubble bubble-delivered">
+                <strong>{{ leader.delivered }}</strong> টি
+              </span>
+            </td>
+
+            <!-- Courier / Shipping -->
+            <td class="text-center">
+              <span class="bubble bubble-transit">{{ (leader.sentToCourier || 0) + (leader.shipping || 0) }}</span>
+            </td>
+
+            <!-- Processing -->
+            <td class="text-center">
+              <span class="bubble bubble-processing">{{ leader.processing || 0 }}</span>
+            </td>
+
+            <!-- Cancel / Refund -->
+            <td class="text-center">
+              <span class="bubble bubble-cancel" *ngIf="(leader.cancelled || 0) + (leader.refunded || 0) > 0">
+                {{ (leader.cancelled || 0) + (leader.refunded || 0) }}
+              </span>
+              <span class="text-muted" *ngIf="(leader.cancelled || 0) + (leader.refunded || 0) === 0">০</span>
+            </td>
+
+            <!-- Success Rate Bar -->
+            <td class="text-center success-rate-cell">
+              <div class="rate-progress-wrapper">
+                <div class="rate-bar-bg">
+                  <div class="rate-bar-fill" [style.width.%]="leader.deliveryRate"></div>
+                </div>
+                <span class="rate-label">{{ leader.deliveryRate }}%</span>
+              </div>
+            </td>
+
+            <!-- Delivered Revenue -->
+            <td class="text-right amount-cell">
+              <strong>৳{{ leader.deliveredAmount | number : '': 'bn' }}</strong>
+            </td>
+
+            <!-- Action -->
+            <td class="text-center">
+              <button mat-stroked-button color="primary" class="filter-btn-compact" (click)="selectModerator(leader.adminId)">
+                ফিল্টার লগ
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODERATOR PERFORMANCE GRAPH (মাসিক বা নির্দিষ্ট সময়ে কার কত টাকার অর্ডার ডেলিভারি হয়েছে) -->
+  <div class="section-card mat-elevation-z1 graph-section">
+    <div class="section-header graph-header">
+      <div class="header-left">
+        <h2>
+          <mat-icon>bar_chart</mat-icon> মডারেটর পারফরম্যান্স অ্যানালিটিক্স গ্রাফ (Moderator Analytics Graph)
+        </h2>
+        <span class="hint">মডারেটরদের সফল ডেলিভার্ড টাকার পরিমাণ ও কাজের তুলনা গ্রাফের মাধ্যমে পর্যবেক্ষণ করুন</span>
+      </div>
+      <div class="graph-metric-tabs">
+        <button
+          type="button"
+          class="metric-tab-btn"
+          [class.active]="activeChartMetric === 'revenue'"
+          (click)="setChartMetric('revenue')"
+        >
+          <mat-icon>payments</mat-icon> ডেলিভার্ড রাজস্ব (৳ Revenue)
+        </button>
+        <button
+          type="button"
+          class="metric-tab-btn"
+          [class.active]="activeChartMetric === 'orders'"
+          (click)="setChartMetric('orders')"
+        >
+          <mat-icon>shopping_cart</mat-icon> ডেলিভার্ড অর্ডার সংখ্যা
+        </button>
+        <button
+          type="button"
+          class="metric-tab-btn"
+          [class.active]="activeChartMetric === 'activity'"
+          (click)="setChartMetric('activity')"
+        >
+          <mat-icon>insights</mat-icon> মোট অ্যাক্টিভিটি
+        </button>
+      </div>
+    </div>
+
+    <!-- Chart Container -->
+    <div class="chart-container-wrapper" *ngIf="chartLabels && chartLabels.length > 0; else noChartData">
+      <div class="chart-canvas-box">
+        <canvas
+          baseChart
+          [datasets]="chartData"
+          [labels]="chartLabels"
+          [options]="chartOptions"
+          [chartType]="chartType"
+          [legend]="chartLegend"
+        >
+        </canvas>
+      </div>
+    </div>
+
+    <ng-template #noChartData>
+      <div class="empty-chart-box">
+        <mat-icon>analytics</mat-icon>
+        <p>নির্বাচিত সময়সীমায় গ্রাফ প্রদর্শনের জন্য পর্যাপ্ত তথ্য নেই। ফিল্টার পরিবর্তন করে অন্য সময় নির্বাচন করুন।</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- KPI Summary Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card total-card">
+      <div class="kpi-icon">
+        <mat-icon>history_edu</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <h3>{{ summary?.totalActions || 0 }}</h3>
+        <p>মোট অ্যাক্টিভিটি (Total Actions)</p>
+      </div>
+    </div>
+
+    <div class="kpi-card created-card">
+      <div class="kpi-icon">
+        <mat-icon>add_shopping_cart</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <h3>{{ summary?.ordersCreated || 0 }}</h3>
+        <p>অর্ডার তৈরি (Orders Created)</p>
+      </div>
+    </div>
+
+    <div class="kpi-card status-card">
+      <div class="kpi-icon">
+        <mat-icon>swap_horiz</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <h3>{{ summary?.statusChanges || 0 }}</h3>
+        <p>স্ট্যাটাস পরিবর্তন (Status Changes)</p>
+      </div>
+    </div>
+
+    <div class="kpi-card edited-card">
+      <div class="kpi-icon">
+        <mat-icon>edit_note</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <h3>{{ summary?.ordersEdited || 0 }}</h3>
+        <p>অর্ডার এডিট (Orders Edited)</p>
+      </div>
+    </div>
+
+    <div class="kpi-card courier-card">
+      <div class="kpi-icon">
+        <mat-icon>local_shipping</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <h3>{{ summary?.sentToCourier || 0 }}</h3>
+        <p>কুরিয়ারে প্রেরণ (Sent to Courier)</p>
+      </div>
+    </div>
+
+    <div class="kpi-card moderators-card">
+      <div class="kpi-icon">
+        <mat-icon>people</mat-icon>
+      </div>
+      <div class="kpi-details">
+        <h3>{{ summary?.activeModeratorsCount || 0 }}</h3>
+        <p>সক্রিয় কর্মী (Active Handlers)</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Moderator Workload Breakdown Cards -->
+  <div class="section-card mat-elevation-z1" *ngIf="moderatorStats && moderatorStats.length > 0">
+    <div class="section-header">
+      <h2>
+        <mat-icon>leaderboard</mat-icon> কর্মীভিত্তিক কাজের পরিসংখ্যান (Workload by Moderator)
+      </h2>
+      <span class="hint">মডারেটর কার্ডে ক্লিক করে তার নির্দিষ্ট অ্যাক্টিভিটি ফিল্টার করুন</span>
+    </div>
+
+    <div class="moderator-cards-grid">
+      <div
+        class="mod-card"
+        *ngFor="let mod of moderatorStats"
+        [class.selected]="selectedAdminId === mod.adminId"
+        (click)="selectModerator(mod.adminId)"
+      >
+        <div class="mod-top">
+          <div class="mod-avatar">
+            <span *ngIf="!mod.profileImg">{{ getAdminInitials(mod.name) }}</span>
+            <img *ngIf="mod.profileImg" [src]="mod.profileImg" alt="Profile" />
+          </div>
+          <div class="mod-info">
+            <h4>{{ mod.name }}</h4>
+            <span class="mod-username">@{{ mod.username }}</span>
+            <span class="mod-role">{{ mod.role }}</span>
+          </div>
+          <div class="mod-actions-count">
+            <span class="count">{{ mod.totalActions }}</span>
+            <span class="label">অ্যাকশন</span>
+          </div>
+        </div>
+
+        <div class="mod-stats-bar">
+          <div class="stat-item" title="তৈরি করা অর্ডার">
+            <span class="stat-label">তৈরি:</span>
+            <span class="stat-val text-green">{{ mod.ordersCreated }}</span>
+          </div>
+          <div class="stat-item" title="স্ট্যাটাস পরিবর্তন">
+            <span class="stat-label">স্ট্যাটাস:</span>
+            <span class="stat-val text-blue">{{ mod.statusChanges }}</span>
+          </div>
+          <div class="stat-item" title="এডিট">
+            <span class="stat-label">এডিট:</span>
+            <span class="stat-val text-orange">{{ mod.ordersEdited }}</span>
+          </div>
+          <div class="stat-item" title="কুরিয়ারে পাঠানো">
+            <span class="stat-label">কুরিয়ার:</span>
+            <span class="stat-val text-purple">{{ mod.sentToCourier }}</span>
+          </div>
+        </div>
+
+        <div class="mod-footer" *ngIf="mod.lastActive">
+          <mat-icon>schedule</mat-icon>
+          <span>সর্বশেষ সক্রিয়: {{ mod.lastActive | date: 'medium' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Activity Logs Table -->
+  <div class="section-card mat-elevation-z1">
+    <div class="section-header table-header-flex">
+      <div>
+        <h2>
+          <mat-icon>receipt_long</mat-icon> বিস্তারিত অ্যাক্টিভিটি হিস্ট্রি লগ (Detailed Activity Stream)
+        </h2>
+        <span class="count-badge" *ngIf="totalLogs">{{ totalLogs }} টি রেকর্ড পাওয়া গেছে</span>
+      </div>
+    </div>
+
+    <div class="table-responsive" *ngIf="logs && logs.length > 0; else noLogsTemplate">
+      <table class="activity-table">
+        <thead>
+          <tr>
+            <th>সময় ও তারিখ</th>
+            <th>মডারেটর / কর্মী</th>
+            <th>অ্যাকশন</th>
+            <th>অর্ডার আইডি</th>
+            <th>কাস্টমার তথ্য</th>
+            <th>বিবরণ ও ট্রানজিশন</th>
+            <th>অর্ডার মূল্য</th>
+            <th>বর্তমান স্ট্যাটাস</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of logs | paginate: { itemsPerPage: pageSize, currentPage: currentPage, totalItems: totalLogs }">
+            <td class="date-col">
+              <div class="date-main">{{ log.date | date: 'dd MMM, yyyy' }}</div>
+              <div class="date-time">{{ log.date | date: 'hh:mm a' }}</div>
+            </td>
+
+            <td class="moderator-col">
+              <div class="mod-cell">
+                <div class="cell-avatar">{{ getAdminInitials(log.adminName) }}</div>
+                <div>
+                  <div class="cell-name">{{ log.adminName || log.adminUsername || 'Unknown' }}</div>
+                  <div class="cell-role-tag">{{ log.adminRole }}</div>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span class="action-badge" [ngClass]="getActionBadgeClass(log.action)">
+                {{ log.action }}
+              </span>
+            </td>
+
+            <td class="order-id-col">
+              <a [routerLink]="['../', 'order-details', log.orderDbId]" class="order-link" matTooltip="অর্ডার ডিটেইলস দেখুন">
+                #{{ log.orderId }}
+                <mat-icon class="link-icon">open_in_new</mat-icon>
+              </a>
+            </td>
+
+            <td class="customer-col">
+              <div class="cust-name">{{ log.customerName || '-' }}</div>
+              <div class="cust-phone">
+                <mat-icon>phone</mat-icon> {{ log.customerPhone || '-' }}
+              </div>
+            </td>
+
+            <td class="desc-col">
+              <div class="desc-text">{{ log.description || '-' }}</div>
+              <div class="status-change-preview" *ngIf="log.beforeStatus !== undefined && log.afterStatus !== undefined && log.beforeStatus !== log.afterStatus">
+                <span class="status-chip old">{{ getStatusLabel(log.beforeStatus) }}</span>
+                <mat-icon>trending_flat</mat-icon>
+                <span class="status-chip new">{{ getStatusLabel(log.afterStatus) }}</span>
+              </div>
+            </td>
+
+            <td class="amount-col">
+              <strong>৳{{ log.grandTotal | number : '': 'bn' }}</strong>
+            </td>
+
+            <td>
+              <span class="status-badge" [ngClass]="getStatusBadgeClass(log.currentStatus)">
+                {{ getStatusLabel(log.currentStatus) }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination-wrapper">
+        <pagination-controls
+          (pageChange)="onPageChange($event)"
+          previousLabel="পূর্ববর্তী"
+          nextLabel="পরবর্তী"
+        ></pagination-controls>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <ng-template #noLogsTemplate>
+      <div class="empty-state" *ngIf="!isLoading">
+        <mat-icon>search_off</mat-icon>
+        <h3>কোন অ্যাক্টিভিটি রেকর্ড পাওয়া যায়নি</h3>
+        <p>নির্বাচিত মডারেটর অথবা নির্দিষ্ট সময়কালে কোনো অর্ডার বা অ্যাক্টিভিটি পাওয়া যায়নি। ফিল্টার পরিবর্তন করে পুনরায় চেষ্টা করুন।</p>
+        <button mat-stroked-button color="primary" (click)="setDateShortcut('all'); selectedAdminId = 'all'">
+          সকল ফিল্টার রিসেট করুন
+        </button>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Spinner -->
+  <ngx-spinner bdColor="rgba(0, 0, 0, 0.4)" size="medium" color="#fff" type="ball-atom" [fullScreen]="false">
+    <p style="color: white">ডাটা লোড হচ্ছে...</p>
+  </ngx-spinner>
+</div>

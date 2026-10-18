@@ -1,0 +1,311 @@
+<div class="header">
+  <button mat-raised-button color="accent" (click)="downloadPdfInvoice('download')">
+    <mat-icon>file_download</mat-icon>
+    Download Pdf
+  </button>
+
+  <button mat-raised-button color="warn" (click)="downloadPdfInvoice('print')">
+    <mat-icon>print</mat-icon>
+    Print Order
+  </button>
+
+  <button mat-raised-button color="primary" [routerLink]="['../../', 'edit-order', id]">
+    <mat-icon>edit</mat-icon>
+    Edit Order
+  </button>
+</div>
+
+<section class="admin-data-sec">
+
+  <div class="top-data-header">
+    <div class="title">
+      <h2>Order Details</h2>
+    </div>
+  </div> <!-- END TOP DATA HEADER -->
+
+  <hr class="center-square">
+
+  <div class="profile">
+    <!--    <div class="img-thumb">-->
+    <!--      <img [src]="user?.profileImg ? user?.profileImg : '/assets/images/avatar/user_low.png'" alt="">-->
+    <!--    </div>-->
+    <div class="info">
+      <h2>Order ID: {{order?.orderId}}</h2>
+      <h2>Checkout Date: {{order?.checkoutDate }}</h2>
+      <div class="row">
+        <h2>Payment Status: <span [style.color]="order?.paymentStatus === 'paid' ? 'green' : 'red'">
+            {{order?.paymentStatus}}
+          </span></h2>
+        <h2>Payment Type: {{order?.paymentType}}</h2>
+      </div>
+      <h2>Order Status: {{order?.orderStatus | orderStatus}}</h2>
+      <h2 *ngIf="order?.bkashPaymentId">Bkash Payment Id: {{order?.bkashPaymentId}}</h2>
+      <h2 *ngIf="order?.bkashTrxId">Bkash Transaction Id: {{order?.bkashTrxId}}</h2>
+      <h2 *ngIf="order?.refundTrxID">Refund Transaction Id: {{order?.refundTrxID}}</h2>
+      <h2>Last Update: {{order?.updatedAt | date: 'mediumDate'}}</h2>
+      <!--      <h2 style="color: green; font-weight: bold" *ngIf="order?.preferredDateString || order?.preferredTime">Preferable-->
+      <!--        Delivery Time: {{order?.preferredTime}} {{order?.preferredDateString}}</h2>-->
+      <h2 class="note-content" *ngIf="order?.note">Note: {{order?.note}}</h2>
+    </div>
+  </div>
+
+  <div class="table-wrapper space">
+
+    <!--    <div class="table-action dual" >-->
+    <!--      <div class="left"></div>-->
+    <!--      <div class="right">-->
+    <!--        <button mat-raised-button color="accent" (click)="openProductListDialog()">-->
+    <!--          <mat-icon>add</mat-icon>-->
+    <!--          Edit Product-->
+    <!--        </button>-->
+    <!--      </div>-->
+    <!--    </div> &lt;!&ndash; END Table Action &ndash;&gt;-->
+
+    <table>
+      <tr>
+        <th>SL</th>
+        <th>Image</th>
+        <th>Name</th>
+        <!--        <th>Unit</th>-->
+        <th>Category</th>
+        <th>Sub Category</th>
+        <!--        <th>Brand</th>-->
+        <th>Discount</th>
+        <th>Sale Price</th>
+        <th>Quantity</th>
+      </tr>
+      <tr *ngFor="let data of order?.orderedItems; let i = index">
+        <td>{{i + 1}}</td>
+        <td>
+          <img checkImageDefault class="table-image" [src]="data && data?.image ? data.image : ''" [alt]="">
+        </td>
+        <td>{{data.name}} <span *ngIf="data?.publisher?.name"><br>({{data.publisher.name}})</span></td>
+        <!--        <td>{{data.unit ? data.unit : 'N/A'}}</td>-->
+        <td>{{data.category?.name}}</td>
+        <td>{{data.subCategory && data.subCategory?.name ? data.subCategory?.name : 'N/A'}}</td>
+        <!--        <td>{{data.brand?.name ? data.brand?.name : 'N/A'}}</td>-->
+        <td>{{getDiscountAmount(data)}}Tk</td>
+        <!--        <td>৳{{data.unitPrice | number : '': 'bn'}}</td>-->
+        <td><span style="font-size: 17px;padding-right: 3px">৳{{data.unitPrice | number : '': 'bn'}}</span> <del
+            *ngIf="data?.discountAmount > 0">৳{{data?.regularPrice}}</del></td>
+
+        <td>{{data.quantity}}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="bottom-view">
+    <div class="action info">
+      <div class="item" style="border-bottom: none;">
+        <div class="left">
+          Name
+        </div>
+        <div class="right">
+          <p>{{order?.name}}</p>
+        </div>
+      </div>
+
+      <div class="item" style="border-bottom: none;">
+        <div class="left">
+          Phone No
+        </div>
+        <div class="right">
+          <p>{{order?.phoneNo}}</p>
+        </div>
+      </div>
+
+      <div class="item" style="border-bottom: none;">
+        <div class="left">
+          Email
+        </div>
+        <div class="right">
+          <p>{{order?.email | checkNull }}</p>
+        </div>
+      </div>
+
+      <div class="item" style="border-bottom: none;">
+        <div class="left">
+          Division
+        </div>
+        <div class="right">
+          <p>{{order?.division?.name | checkNull }}</p>
+        </div>
+      </div>
+
+      <div class="item" style="border-bottom: none;">
+        <div class="left">
+          Area
+        </div>
+        <div class="right">
+          <p>{{order?.area?.name | checkNull }}</p>
+        </div>
+      </div>
+
+      <div class="item" style="border-bottom: none;">
+        <div class="left">
+          Zone
+        </div>
+        <div class="right">
+          <p>{{order?.zone?.name | checkNull }}</p>
+        </div>
+      </div>
+
+      <!--      <div class="item">-->
+      <!--        <div class="left">-->
+      <!--          City-->
+      <!--        </div>-->
+      <!--        <div class="right">-->
+      <!--          <p class="bold">{{order?.di}}</p>-->
+      <!--        </div>-->
+      <!--      </div>-->
+
+      <div class="item test">
+        <div class="left left-Shipping">
+          Shipping Address
+        </div>
+        <div class="right">
+          <p class="bold">{{order?.shippingAddress}}</p>
+        </div>
+      </div>
+
+      <!--      <div class="item test">-->
+      <!--        <div class="left left-Shipping">-->
+      <!--          Order Note-->
+      <!--        </div>-->
+      <!--        <div class="right">-->
+      <!--          <p class="bold">{{order?.note}}</p>-->
+      <!--        </div>-->
+      <!--      </div>-->
+    </div>
+
+    <div class="action calculation">
+      <div class="item" style="border-bottom: none;">
+        <div class="left">
+          Sub Total (৳)
+        </div>
+        <div class="right">
+          <p>{{order?.subTotal}}</p>
+
+          <div class="stock-badge" *ngIf="order?.discount !== 0">
+            <span>Discount ({{order?.discount}}Tk)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="item" style="border-bottom: none;">
+        <div class="left">
+          Delivery Charge (৳)
+        </div>
+        <div class="right">
+          <p>{{order?.deliveryCharge}}</p>
+        </div>
+      </div>
+
+      <div class="item" style="border-bottom: none;" *ngIf="order?.coupon">
+        <div class="left">
+          Coupon Discount (-৳)
+        </div>
+        <div class="right">
+          <p>{{order?.couponDiscount ? order?.couponDiscount : 0}}</p>
+        </div>
+      </div>
+
+      <div class="item" style="border-bottom: none;" *ngIf="order?.orderDiscountFromApps>0">
+        <div class="left">
+          Apps Discount (-৳)
+        </div>
+        <div class="right">
+          <p>{{order?.orderDiscountFromApps ? order?.orderDiscountFromApps : 0}}</p>
+        </div>
+      </div>
+
+
+      <!--      <div class="item" style="border-bottom: none;">-->
+      <!--        <div class="left">-->
+      <!--          Discount (-৳)-->
+      <!--        </div>-->
+      <!--        <div class="right">-->
+      <!--          <p>{{order?.productDiscount ? order?.productDiscount : 0}}</p>-->
+      <!--        </div>-->
+      <!--      </div>-->
+
+      <div class="item">
+        <div class="left">
+          Grand Total (৳)
+        </div>
+        <div class="right">
+          <p class="bold">{{order?.grandTotal | number : '' : 'bn'}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="order-timeline" *ngIf="order?.hasOrderTimeline">
+    <div class="view">
+      <div class="title">
+        <h2>Order Timeline</h2>
+      </div>
+      <div class="content">
+        <app-order-timeline [order]="order"></app-order-timeline>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODERATOR AUDIT TRAIL -->
+  <div class="moderator-audit-section">
+    <div class="view">
+      <div class="title">
+        <h2>
+          <mat-icon style="vertical-align: middle; margin-right: 6px;">manage_accounts</mat-icon>
+          মডারেটর অ্যাক্টিভিটি হিস্ট্রি (Moderator Audit Trail)
+        </h2>
+      </div>
+      <div class="audit-content">
+        <div class="audit-timeline" *ngIf="order?.moderatorLogs && order?.moderatorLogs.length > 0; else noAuditLogs">
+          <div class="audit-item" *ngFor="let log of order?.moderatorLogs">
+            <div class="audit-marker">
+              <span class="audit-dot" [ngClass]="getActionBadgeClass(log.action)"></span>
+              <span class="audit-line"></span>
+            </div>
+            <div class="audit-body">
+              <div class="audit-header">
+                <span class="action-tag" [ngClass]="getActionBadgeClass(log.action)">{{ log.action }}</span>
+                <span class="moderator-name">
+                  <strong>{{ log.adminName || log.adminUsername || 'Admin' }}</strong>
+                  <span class="role-pill" *ngIf="log.adminRole">({{ log.adminRole }})</span>
+                </span>
+                <span class="audit-time">{{ log.date | date: 'dd MMM yyyy, hh:mm a' }}</span>
+              </div>
+              <div class="audit-desc" *ngIf="log.description">
+                {{ log.description }}
+              </div>
+              <div class="audit-status-flow" *ngIf="log.beforeStatus !== undefined && log.afterStatus !== undefined && log.beforeStatus !== log.afterStatus">
+                <span class="flow-pill old">{{ getStatusLabel(log.beforeStatus) }}</span>
+                <mat-icon class="flow-arrow">arrow_forward</mat-icon>
+                <span class="flow-pill new">{{ getStatusLabel(log.afterStatus) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noAuditLogs>
+          <div class="no-audit">
+            <p *ngIf="order?.processedBy">
+              অর্ডারটি প্রসেস করেছেন: <strong>{{ order?.processedBy?.name || order?.processedBy?.username || order?.processedBy }}</strong>
+            </p>
+            <p *ngIf="!order?.processedBy" style="color: #888;">
+              এই অর্ডারের জন্য এখনও কোনো মডারেটর অ্যাক্টিভিটি লগ সংরক্ষণ করা হয়নি।
+            </p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING TEMPLATE -->
+  <ngx-spinner bdColor="rgba(0, 0, 0, 0.5)" size="medium" color="#fff" type="ball-atom" [fullScreen]="false">
+    <p style="color: white"> Loading... </p>
+  </ngx-spinner>
+
+</section>
