@@ -27,6 +27,8 @@ export interface Order {
   subTotal?: number;
   deliveryCharge?: number;
   discount?: number;
+  additionalDiscount?: number;
+  extraDiscount?: number;
   productDiscount?: number;
   coupon?: string;
   couponDiscount?: number;
@@ -106,8 +108,10 @@ export interface OrderTimeline {
 }
 
 export interface DiscountType {
-  type: string;
-  amount: number;
+  type?: string;
+  amount?: number;
+  productDiscount?: string | number;
+  extraDiscount?: number;
 }
 
 export interface OrderTimelineType {

@@ -219,6 +219,16 @@
         </div>
       </div>
 
+      <div class="item" style="border-bottom: none;" *ngIf="(order?.additionalDiscount || order?.extraDiscount) > 0">
+        <div class="left">
+          Additional Discount (-৳)
+        </div>
+        <div class="right">
+          <p>{{order?.additionalDiscount || order?.extraDiscount}}</p>
+        </div>
+      </div>
+
+
 
       <!--      <div class="item" style="border-bottom: none;">-->
       <!--        <div class="left">-->
