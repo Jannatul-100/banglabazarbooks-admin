@@ -281,19 +281,6 @@
 
     <div class="item" style="border-bottom: none;">
       <div class="left">
-        Delivery Charge (৳)
-      </div>
-      <div class="right">
-        <mat-form-field appearance="legacy" class="w-100" floatLabel="never">
-          <input digitOnly pattern="^\d+(\.\d{1,2})?$" [decimal]="true" type="number" matInput
-            placeholder="Enter amount" [(ngModel)]="deliveryCharge">
-          <mat-error>This field is required</mat-error>
-        </mat-form-field>
-      </div>
-    </div>
-
-    <div class="item" style="border-bottom: none;">
-      <div class="left">
         Discount (-৳)
       </div>
       <div class="right">
@@ -306,12 +293,37 @@
 
     <div class="item" style="border-bottom: none;">
       <div class="left">
+        Sale Price Total (৳)
+      </div>
+      <div class="right">
+        <mat-form-field appearance="legacy" class="w-100" floatLabel="never">
+          <input readonly matInput placeholder="Enter amount" [value]="totalSalePrice | number : '' : 'bn'">
+          <mat-error>This field is required</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="item" style="border-bottom: none;">
+      <div class="left">
         Additional Discount (-৳)
       </div>
       <div class="right">
         <mat-form-field appearance="legacy" class="w-100" floatLabel="never">
           <input digitOnly pattern="^\d+(\.\d{1,2})?$" [decimal]="true" type="number" matInput
-            placeholder="Enter amount" [(ngModel)]="additionalDiscount">
+            placeholder="Enter amount" [(ngModel)]="additionalDiscount" (ngModelChange)="calculateDynamicDeliveryCharge()">
+          <mat-error>This field is required</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="item" style="border-bottom: none;">
+      <div class="left">
+        Delivery Charge (৳)
+      </div>
+      <div class="right">
+        <mat-form-field appearance="legacy" class="w-100" floatLabel="never">
+          <input digitOnly pattern="^\d+(\.\d{1,2})?$" [decimal]="true" type="number" matInput
+            placeholder="Enter amount" [(ngModel)]="deliveryCharge">
           <mat-error>This field is required</mat-error>
         </mat-form-field>
       </div>

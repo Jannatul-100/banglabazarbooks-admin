@@ -154,42 +154,19 @@ export class AddOrderComponent implements OnInit, OnDestroy {
 
   private setDataForm() {
     if (this.order) {
-      this.dataForm.patchValue(this.order);
-      this.deliveryCharge = this.order.deliveryCharge;
-      this.discount = this.order.discount;
-      this.discountTypes = this.order.discountTypes;
-      this.preferredTime = this.order.preferredTime;
-      this.dataForm.patchValue({ division: this.order?.division?._id });
-      // console.log('this.order?.division?._id',this.order?.division?._id)
       if (this.order?.division) {
         this.divisionSelected = this.order?.division;
         this.getAreaByDivision();
       }
       if (this.order?.area) {
-        this.dataForm.patchValue({ area: this.order?.area?._id });
         this.areaSelected = this.order?.area;
         this.getZoneByArea();
       }
       if (this.order?.zone) {
-        this.dataForm.patchValue({ zone: this.order?.zone?._id });
         this.zoneSelected = this.order?.zone;
       }
-      if (this.order?.courierData?.providerName) {
-        this.dataForm.patchValue({ courier: this.order.courierData.providerName });
-      }
-      this.dataForm.patchValue({
-        preferredDate: new Date(this.order.preferredDateString),
-      });
 
-      if (this.order.hasOrderTimeline) {
-        this.dataForm.patchValue({
-          processingDate: this.order?.orderTimeline?.processed?.expectedDate,
-          shippingDate: this.order?.orderTimeline?.shipped?.expectedDate,
-          deliveringDate: this.order?.orderTimeline?.delivered?.expectedDate,
-        });
-      }
-
-      this.selectedProducts = this.order.orderedItems.map((m) => {
+      this.selectedProducts = (this.order.orderedItems || []).map((m) => {
         return {
           _id: m._id,
           name: m.name,
@@ -209,7 +186,57 @@ export class AddOrderComponent implements OnInit, OnDestroy {
           unit: m.unit ? m.unit : null,
         } as Product;
       });
-      console.log(this.selectedProducts);
+
+      this.dataForm.patchValue(this.order, { emitEvent: false });
+      if (this.order?.division?._id) {
+        this.dataForm.patchValue({ division: this.order.division._id }, { emitEvent: false });
+      }
+      if (this.order?.area?._id) {
+        this.dataForm.patchValue({ area: this.order.area._id }, { emitEvent: false });
+      }
+      if (this.order?.zone?._id) {
+        this.dataForm.patchValue({ zone: this.order.zone._id }, { emitEvent: false });
+      }
+      if (this.order?.courierData?.providerName) {
+        this.dataForm.patchValue({ courier: this.order.courierData.providerName }, { emitEvent: false });
+      }
+      if (this.order?.preferredDateString) {
+        this.dataForm.patchValue({
+          preferredDate: new Date(this.order.preferredDateString),
+        }, { emitEvent: false });
+      }
+
+      if (this.order.hasOrderTimeline) {
+        this.dataForm.patchValue({
+          processingDate: this.order?.orderTimeline?.processed?.expectedDate,
+          shippingDate: this.order?.orderTimeline?.shipped?.expectedDate,
+          deliveringDate: this.order?.orderTimeline?.delivered?.expectedDate,
+        }, { emitEvent: false });
+      }
+
+      if (this.order.deliveryCharge !== undefined && this.order.deliveryCharge !== null) {
+        this.deliveryCharge = this.order.deliveryCharge;
+      } else {
+        this.calculateDynamicDeliveryCharge();
+      }
+
+      this.discount = this.order.discount;
+      this.discountTypes = this.order.discountTypes;
+      if (this.order.additionalDiscount !== undefined && this.order.additionalDiscount !== null) {
+        this.additionalDiscount = Number(this.order.additionalDiscount);
+      } else if (this.order.extraDiscount !== undefined && this.order.extraDiscount !== null) {
+        this.additionalDiscount = Number(this.order.extraDiscount);
+      } else if (Array.isArray(this.order.discountTypes)) {
+        const extra = this.order.discountTypes.find((f: any) => f.extraDiscount !== undefined || f.type === 'additional');
+        if (extra) {
+          this.additionalDiscount = Number(extra.extraDiscount ?? extra.amount ?? 0);
+        } else {
+          this.additionalDiscount = 0;
+        }
+      } else {
+        this.additionalDiscount = 0;
+      }
+      this.preferredTime = this.order.preferredTime;
     }
   }
   onSubmit() {
@@ -269,23 +296,31 @@ export class AddOrderComponent implements OnInit, OnDestroy {
       } as any;
     });
 
-    // Discount Types set
-    // if (this.additionalDiscount && this.additionalDiscount > 0) {
-    //   const hasAdditionalDis = this.discountTypes.find(
-    //     (f) => f.type === 'additional'
-    //   );
-    //   if (hasAdditionalDis) {
-    //     const index = this.discountTypes.findIndex(
-    //       (f) => f.type === 'additional'
-    //     );
-    //     this.discountTypes[index].amount = this.additionalDiscount;
-    //   } else {
-    //     this.discountTypes.push({
-    //       type: 'additional',
-    //       amount: this.additionalDiscount,
-    //     });
-    //   }
-    // }
+    const additional = Number(this.additionalDiscount) || 0;
+
+    let discountTypes = Array.isArray(this.discountTypes) ? [...this.discountTypes] : [];
+    const existingIndex = discountTypes.findIndex(
+      (f: any) => f.type === 'additional' || f.extraDiscount !== undefined
+    );
+    if (existingIndex > -1) {
+      if (additional > 0) {
+        discountTypes[existingIndex] = {
+          ...discountTypes[existingIndex],
+          type: 'additional',
+          amount: additional,
+          extraDiscount: additional,
+        };
+      } else {
+        discountTypes.splice(existingIndex, 1);
+      }
+    } else if (additional > 0) {
+      discountTypes.push({
+        type: 'additional',
+        amount: additional,
+        extraDiscount: additional,
+      });
+    }
+
     let selectDivision = this.divisions.find((d) => d._id === this.dataForm.value.division);
 
     const orderData: any = {
@@ -303,9 +338,11 @@ export class AddOrderComponent implements OnInit, OnDestroy {
       subTotal: this.cartSubTotal,
       deliveryCharge: this.deliveryCharge, // API will add extra charge to this base value
       discount: this.discountTotal,
+      additionalDiscount: additional,
+      extraDiscount: additional,
       hasPreOrder: products.some((p: any) => p.orderType === 'pre_order' || (p as any).isPreOrder),
       grandTotal: this.grandTotal,
-      discountTypes: this.discountTypes,
+      discountTypes: discountTypes,
       checkoutDate: this.utilsService.getDateString(new Date()),
       orderTimeline: null,
       hasOrderTimeline: this.dataForm.value.hasOrderTimeline,
@@ -378,47 +415,52 @@ export class AddOrderComponent implements OnInit, OnDestroy {
     }).reduce((acc, value) => acc + value, 0);
   }
 
+  get totalSalePrice(): number {
+    return Math.max(0, this.cartSubTotal - this.discountTotal);
+  }
+
   // get discountTotal(): number {
   //   return this.discount + this.additionalDiscount;
   // }
 
   get grandTotal(): number {
-    return Math.round(this.cartSubTotal + (this.deliveryCharge || 0) - this.discountTotal - (this.additionalDiscount || 0));
+    const additional = Number(this.additionalDiscount) || 0;
+    const delivery = Number(this.deliveryCharge) || 0;
+    return Math.round(this.cartSubTotal + delivery - this.discountTotal - additional);
   }
 
   calculateDynamicDeliveryCharge(): void {
-    if (this.id && this.order && this.order.deliveryCharge !== undefined && this.order.deliveryCharge !== null) {
-      // In edit mode with existing charge, don't overwrite on initial load
-    }
     const hasFreeDelivery = this.selectedProducts.some((p: any) => p.freeDelivery === true);
     if (hasFreeDelivery) {
       this.deliveryCharge = 0;
       return;
     }
 
-    const bookTotal = Math.max(0, this.cartSubTotal - this.discountTotal);
-    const courier = this.dataForm?.get('courier')?.value;
-    const isSundarban = courier === 'Sundarban Courier' || (courier && courier.toLowerCase().includes('sundarban'));
+    const additional = Number(this.additionalDiscount) || 0;
+    const bookTotal = Math.max(0, this.cartSubTotal - this.discountTotal - additional);
+    const courier = this.dataForm?.get('courier')?.value || this.order?.courierData?.providerName;
+    const isSundarban = courier === 'Sundarban Courier' || courier === 'sundarban' || (courier && courier.toLowerCase().includes('sundarban'));
 
-    const isDhaka = this.divisionSelected && (
-      this.divisionSelected.name?.toLowerCase()?.includes('dhaka') ||
-      this.divisionSelected.name?.includes('ঢাকা')
-    );
+    let div = this.divisionSelected || this.order?.division;
+    if (!div && this.dataForm?.get('division')?.value && this.divisions?.length) {
+      div = this.divisions.find((d: any) => d._id === this.dataForm?.get('division')?.value);
+    }
+    const divName = (typeof div === 'string' ? div : div?.name) || '';
+    const isDhaka = divName.toLowerCase().includes('dhaka') || divName.includes('ঢাকা');
+
+    const extraThousands = bookTotal > 1000 ? Math.ceil((bookTotal - 1000) / 1000) : 0;
 
     if (isSundarban) {
       // Sundarban: 0-1000: 60, each additional 1000: +15
-      const extra = Math.ceil(Math.max(0, bookTotal - 1000) / 1000) * 15;
-      this.deliveryCharge = 60 + extra;
+      this.deliveryCharge = 60 + (extraThousands * 15);
     } else {
-      // Pathao / Standard:
+      // Standard / Pathao:
       if (isDhaka) {
         // Inside Dhaka: 0-1000: 60, each additional 1000: +15
-        const extra = Math.ceil(Math.max(0, bookTotal - 1000) / 1000) * 15;
-        this.deliveryCharge = 60 + extra;
+        this.deliveryCharge = 60 + (extraThousands * 15);
       } else {
         // Outside Dhaka: 0-1000: 110, each additional 1000: +20
-        const extra = Math.ceil(Math.max(0, bookTotal - 1000) / 1000) * 20;
-        this.deliveryCharge = 110 + extra;
+        this.deliveryCharge = 110 + (extraThousands * 20);
       }
     }
   }
@@ -577,6 +619,7 @@ export class AddOrderComponent implements OnInit, OnDestroy {
     this.formElement.resetForm();
     this.selectedProducts = [];
     this.discountTypes = [];
+    this.additionalDiscount = 0;
   }
 
   /**
@@ -613,9 +656,11 @@ export class AddOrderComponent implements OnInit, OnDestroy {
   }
 
   get discountTotal(): number {
-    // system discountTypes + additional discount + product discount
-    const typeTotal = this.discountTypes?.reduce((acc, d) => acc + (d.amount || 0), 0) || 0;
-    return typeTotal + this.additionalDiscount + this.productDiscountTotal;
+    // product discount + other discountTypes (excluding additional discount)
+    const typeTotal = this.discountTypes
+      ?.filter((d: any) => d.type !== 'additional' && d.extraDiscount === undefined)
+      ?.reduce((acc, d) => acc + (d.amount || 0), 0) || 0;
+    return typeTotal + this.productDiscountTotal;
   }
 
 
