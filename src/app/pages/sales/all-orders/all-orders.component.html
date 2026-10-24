@@ -250,7 +250,8 @@
             <td class="col-name">
               <div class="customer-block">
                 <span class="cust-name">{{ data.name }}</span>
-                <span class="cust-address">{{ data.shippingAddress }}</span>
+                <span class="cust-location" *ngIf="getLocation(data)">{{ getLocation(data) }}</span>
+                <span class="cust-address" *ngIf="data.shippingAddress" [title]="data.shippingAddress">{{ data.shippingAddress }}</span>
                 <div class="fraud-info" *ngIf="data?.fraudChecker?.courierData?.summary">
                   <span class="fraud-ratio" [class.fraud-low]="(data.fraudChecker.courierData.summary.success_ratio || 0) < 70">
                     {{ data.fraudChecker.courierData.summary.success_ratio || 0 }}%

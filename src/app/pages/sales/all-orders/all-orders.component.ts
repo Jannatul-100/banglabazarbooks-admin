@@ -231,6 +231,8 @@ export class AllOrdersComponent implements OnInit {
             city: 1,
             paymentType: 1,
             grandTotal: 1,
+            courierLink: 1,
+            orderedItems: 1,
             checkoutDate: 1,
             orderStatus: 1,
             paymentStatus: 1,
@@ -239,10 +241,17 @@ export class AllOrdersComponent implements OnInit {
             preferredDate: 1,
             preferredTime: 1,
             preferredDateString: 1,
+            orderDiscountFromApps: 1,
             orderFrom: 1,
             createdByAdmin: 1,
             courierData: 1,
+            fraudChecker: 1,
+            shippingAddress: 1,
+            division: 1,
+            area: 1,
+            zone: 1,
             processedBy: 1,
+            hasPreOrder: 1,
           };
 
           const filterData: FilterData = {
@@ -601,6 +610,10 @@ export class AllOrdersComponent implements OnInit {
       courierData: 1,
       processedBy: 1,
       hasPreOrder: 1,
+      shippingAddress: 1,
+      division: 1,
+      area: 1,
+      zone: 1,
     };
 
     const filterData: FilterData = {
@@ -662,6 +675,9 @@ export class AllOrdersComponent implements OnInit {
       courierData: 1,
       fraudChecker: 1,
       shippingAddress: 1,
+      division: 1,
+      area: 1,
+      zone: 1,
       orderFrom: 1,
       createdByAdmin: 1,
       processedBy: 1,
@@ -1346,6 +1362,29 @@ export class AllOrdersComponent implements OnInit {
       return admin.name;
     }
     return 'Unknown';
+  }
+
+  getDivisionName(data: any): string {
+    if (!data?.division) return '';
+    if (typeof data.division === 'string') return data.division.trim();
+    return (data.division.name || '').trim();
+  }
+
+  getAreaName(data: any): string {
+    if (!data?.area && !data?.zone) return '';
+    const areaName = typeof data.area === 'string' ? data.area : (data.area?.name || '');
+    if (areaName) return areaName.trim();
+    const zoneName = typeof data.zone === 'string' ? data.zone : (data.zone?.name || '');
+    return zoneName.trim();
+  }
+
+  getLocation(data: any): string {
+    const division = this.getDivisionName(data);
+    const area = this.getAreaName(data);
+    if (division && area) {
+      return `${division}, ${area}`;
+    }
+    return division || area || '';
   }
 
   ngOnDestroy() {
