@@ -504,6 +504,14 @@
     color: #1a1a1a;
   }
 
+  .cust-location {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
   .cust-address {
     font-size: 11px;
     color: #888;
@@ -512,6 +520,7 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
   }
 }
 
